@@ -44,10 +44,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     // Ensure formatting as bullet points if not already
     if (!responseText.includes('•')) {
-      const summaryLines = responseText.split('\n');
+      const summaryLines: string[] = responseText.split('\n');
       responseText = summaryLines
-        .filter(line => line.trim().length > 0)
-        .map(line => line.trim().startsWith('•') ? line : `• ${line}`)
+        .filter((line: string) => line.trim().length > 0)
+        .map((line: string) => line.trim().startsWith('•') ? line : `• ${line}`)
         .join('\n');
     }
 
