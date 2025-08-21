@@ -5,7 +5,7 @@ import * as pdfjs from 'pdfjs-dist';
 import { v4 as uuidv4 } from 'uuid';
 
 // Ensure upload directory exists
-const UPLOAD_DIR = process.env.UPLOAD_DIR || './uploads';
+const UPLOAD_DIR = process.env.UPLOAD_DIR || '/tmp/uploads';
 fs.ensureDirSync(UPLOAD_DIR);
 fs.ensureDirSync(path.join(UPLOAD_DIR, 'temp'));
 
