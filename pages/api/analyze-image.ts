@@ -52,15 +52,15 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return res.status(200).json({ result: cachedResult });
     }
 
-    // Call Gemini API
+    // Call Gemini API - Updated to use Gemini 2.0
     const genAI = initializeGemini(apiKey);
     const model = genAI.getGenerativeModel({
-      model: 'gemini-1.0-pro-vision',
+      model: 'gemini-2.0-flash', // Updated to stable Gemini 2.0 Flash
       generationConfig: {
         temperature: 0.4,
         topP: 0.8,
         topK: 40,
-        maxOutputTokens: 1024,
+        maxOutputTokens: 2048, // Increased for better responses
       },
     });
 
@@ -90,10 +90,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     - Detailed anatomical descriptions and any abnormalities noted
     - Discussion on the severity and urgency of findings
     - References to relevant medical literature or guidelines if applicable
-    -Highlight the main factors causing the problem, Display it in bold characters.
+    - Highlight the main factors causing the problem, Display it in bold characters.
     ` : ''}`;
 
-    // Prepare image data
+    // Prepare image data for Gemini 2.0
     const imageData = {
       inlineData: {
         data: base64Image,
@@ -124,7 +124,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
 const parseForm = async (req: NextApiRequest): Promise<{ fields: formidable.Fields, files: formidable.Files }> => {
   return new Promise((resolve, reject) => {
-    const uploadDir = '/tmp/uploads/temp'; // Changed this line
+    const uploadDir = '/tmp/uploads/temp';
     
     // Ensure directory exists
     try {
