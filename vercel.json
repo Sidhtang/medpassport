@@ -1,6 +1,12 @@
 {
   "version": 2,
-  "buildCommand": "next build",
-  "outputDirectory": ".next",
-  "public": false
+  "functions": {
+    "pages/api/**/*.js": {
+      "maxDuration": 60
+    }
+  },
+  "env": {
+    "ANALYSIS_CACHE_DIR": "/tmp/cache",
+    "UPLOAD_DIR": "/tmp/uploads"
+  }
 }
