@@ -35,7 +35,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return res.status(400).json({ error: 'API key is required' });
     }
 
-    if (!files.image || !files.image[0]) {
+    if (!files.image || !Array.isArray(files.image) || !files.image[0]) {
       return res.status(400).json({ error: 'No image file uploaded' });
     }
 
