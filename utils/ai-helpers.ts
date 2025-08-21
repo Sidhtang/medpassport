@@ -3,9 +3,17 @@ import fs from 'fs-extra';
 import path from 'path';
 import crypto from 'crypto';
 
+// Use /tmp for Vercel compatibility
+const CACHE_DIR = '/tmp/cache';
+
 // Ensure cache directory exists
-const CACHE_DIR = process.env.ANALYSIS_CACHE_DIR || '/tmp/cache';
-fs.ensureDirSync(CACHE_DIR);
+const ensureCacheDir = () => {
+  try {
+    fs.ensureDirSync(CACHE_DIR);
+  } catch (error) {
+    console.log('Cache directory already exists or created');
+  }
+};
 
 interface CacheData {
   timestamp: number;
@@ -25,6 +33,7 @@ export const generateContentHash = (content: string | Buffer): string => {
 
 export const getCachedAnalysis = (contentHash: string, reportType: string, userRole: string): string | null => {
   try {
+    ensureCacheDir();
     const cacheFilePath = path.join(CACHE_DIR, `${contentHash}_${reportType}_${userRole}.json`);
     if (fs.existsSync(cacheFilePath)) {
       const cachedData = fs.readJSONSync(cacheFilePath) as CacheData;
@@ -42,6 +51,7 @@ export const getCachedAnalysis = (contentHash: string, reportType: string, userR
 
 export const saveToCache = (contentHash: string, reportType: string, userRole: string, analysisResult: string): void => {
   try {
+    ensureCacheDir();
     const cacheFilePath = path.join(CACHE_DIR, `${contentHash}_${reportType}_${userRole}.json`);
     const cacheData: CacheData = {
       timestamp: Date.now(),
