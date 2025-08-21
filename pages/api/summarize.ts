@@ -20,7 +20,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   try {
     const genAI = initializeGemini(actualApiKey);
     const model = genAI.getGenerativeModel({
-      model: 'gemini-1.0-pro',
+      model: 'gemini-2.0-flash', // Updated to stable Gemini 2.0 Flash
       generationConfig: {
         temperature: 0.2,
         topP: 0.8,
@@ -32,7 +32,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     // Create prompt
     const prompt = `Summarize the following medical analysis in 3-5 bullet points, highlighting only the most critical findings, potential concerns, and key recommendations:
 
-    ${text.substring(0, 3000)}
+    ${text.substring(0, 4000)}
 
     Format as bullet points starting with '•'
     `;
