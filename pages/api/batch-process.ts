@@ -40,7 +40,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return res.status(400).json({ error: 'API key is required' });
     }
 
-    if (!files.files || files.files.length === 0) {
+    if (!files.files) {
       return res.status(400).json({ error: 'No files uploaded' });
     }
 
