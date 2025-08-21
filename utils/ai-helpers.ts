@@ -4,7 +4,7 @@ import path from 'path';
 import crypto from 'crypto';
 
 // Ensure cache directory exists
-const CACHE_DIR = process.env.ANALYSIS_CACHE_DIR || './cache';
+const CACHE_DIR = process.env.ANALYSIS_CACHE_DIR || '/tmp/cache';
 fs.ensureDirSync(CACHE_DIR);
 
 interface CacheData {
