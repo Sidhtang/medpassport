@@ -29,12 +29,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     const genAI = initializeGemini(actualApiKey);
     const model = genAI.getGenerativeModel({
-      model: 'gemini-1.0-pro',
+      model: 'gemini-2.0-flash', // Updated to stable Gemini 2.0 Flash
       generationConfig: {
         temperature: 0.2,
         topP: 0.8,
         topK: 40,
-        maxOutputTokens: 1024,
+        maxOutputTokens: 2048, // Increased for better responses
       },
     });
 
@@ -42,6 +42,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const prompt = `Translate the following medical analysis to ${targetLanguage}.
     Maintain all medical terminology but present it in a way that's natural in the target language.
     Keep formatting like bullet points, paragraphs, and section headings intact.
+    
     Text to translate:
     ${text}
     `;
