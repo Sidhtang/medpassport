@@ -4,10 +4,18 @@ import sharp from 'sharp';
 import * as pdfjs from 'pdfjs-dist';
 import { v4 as uuidv4 } from 'uuid';
 
+// Use /tmp for Vercel compatibility
+const UPLOAD_DIR = '/tmp/uploads';
+
 // Ensure upload directory exists
-const UPLOAD_DIR = process.env.UPLOAD_DIR || '/tmp/uploads';
-fs.ensureDirSync(UPLOAD_DIR);
-fs.ensureDirSync(path.join(UPLOAD_DIR, 'temp'));
+const ensureUploadDir = () => {
+  try {
+    fs.ensureDirSync(UPLOAD_DIR);
+    fs.ensureDirSync(path.join(UPLOAD_DIR, 'temp'));
+  } catch (error) {
+    console.log('Upload directories already exist or created');
+  }
+};
 
 // Initialize PDF.js worker
 if (typeof window === 'undefined') {
@@ -44,6 +52,7 @@ export const processImage = async (fileBuffer: Buffer): Promise<string> => {
 };
 
 export const saveUploadedFile = async (fileBuffer: Buffer, fileName: string): Promise<string> => {
+  ensureUploadDir();
   const uniqueId = uuidv4();
   const fileExt = path.extname(fileName);
   const safeFileName = `${uniqueId}${fileExt}`;
@@ -115,17 +124,21 @@ export const getFileType = (fileName: string): string => {
 export const cleanupTempFiles = async (): Promise<void> => {
   try {
     const tempDir = path.join(UPLOAD_DIR, 'temp');
-    const files = await fs.readdir(tempDir);
-    
-    // Get files older than 1 hour
-    const oneHourAgo = Date.now() - (60 * 60 * 1000);
-    
-    for (const file of files) {
-      const filePath = path.join(tempDir, file);
-      const stats = await fs.stat(filePath);
+    if (await fs.pathExists(tempDir)) {
+      const files = await fs.readdir(tempDir);
       
-      if (stats.mtimeMs < oneHourAgo) {
-        await fs.unlink(filePath);
+      // Get files older than 1 hour
+      const oneHourAgo = Date.now() - (60 * 60 * 1000);
+      
+      for (const file of files) {
+        const filePath = path.join(tempDir, file);
+        if (await fs.pathExists(filePath)) {
+          const stats = await fs.stat(filePath);
+          
+          if (stats.mtimeMs < oneHourAgo) {
+            await fs.unlink(filePath);
+          }
+        }
       }
     }
   } catch (error) {
