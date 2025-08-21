@@ -123,8 +123,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
 const parseForm = async (req: NextApiRequest): Promise<{ fields: formidable.Fields, files: formidable.Files }> => {
   return new Promise((resolve, reject) => {
-    const uploadDir = path.join(process.cwd(), 'uploads', 'temp');
-    fs.ensureDirSync(uploadDir);
+    const uploadDir = '/tmp/uploads/temp'; // Changed this line
+    
+    // Ensure directory exists
+    try {
+      fs.ensureDirSync(uploadDir);
+    } catch (error) {
+      console.log('Upload directory already exists or created');
+    }
     
     const form = formidable({
       multiples: true,
