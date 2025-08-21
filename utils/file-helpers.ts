@@ -1,9 +1,8 @@
 import fs from 'fs-extra';
 import path from 'path';
 import sharp from 'sharp';
-import { pdfjs } from 'pdfjs-dist';
+import * as pdfjs from 'pdfjs-dist';
 import { v4 as uuidv4 } from 'uuid';
-import { PassThrough } from 'stream';
 
 // Ensure upload directory exists
 const UPLOAD_DIR = process.env.UPLOAD_DIR || './uploads';
@@ -13,7 +12,7 @@ fs.ensureDirSync(path.join(UPLOAD_DIR, 'temp'));
 // Initialize PDF.js worker
 if (typeof window === 'undefined') {
   // We're on the server
-  pdfjs.GlobalWorkerOptions.workerSrc = path.resolve('./node_modules/pdfjs-dist/build/pdf.worker.js');
+  pdfjs.GlobalWorkerOptions.workerSrc = require.resolve('pdfjs-dist/build/pdf.worker.js');
 }
 
 export const processImage = async (fileBuffer: Buffer): Promise<string> => {
