@@ -45,23 +45,15 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     const genAI = initializeGemini(apiKey);
-    const model = genAI.getGenerativeModel({
-      model: 'gemini-1.0-pro',
-      generationConfig: {
-        temperature: 0.4,
-        topP: 0.8,
-        topK: 40,
-        maxOutputTokens: 1024,
-      },
-    });
     
-    const visionModel = genAI.getGenerativeModel({
-      model: 'gemini-1.0-pro-vision',
+    // Use the same model for both text and vision tasks in Gemini 2.0
+    const model = genAI.getGenerativeModel({
+      model: 'gemini-2.0-flash', // Updated to stable Gemini 2.0 Flash
       generationConfig: {
         temperature: 0.4,
         topP: 0.8,
         topK: 40,
-        maxOutputTokens: 1024,
+        maxOutputTokens: 2048, // Increased for better responses
       },
     });
 
@@ -107,7 +99,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           
           Format your response to be clear and focused on key findings.`;
           
-          // Prepare image data
+          // Prepare image data for Gemini 2.0
           const imageData = {
             inlineData: {
               data: base64Image,
@@ -115,8 +107,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             },
           };
           
-          // Make API request
-          const response = await visionModel.generateContent([prompt, imageData]);
+          // Make API request - Gemini 2.0 can handle both text and images
+          const response = await model.generateContent([prompt, imageData]);
           const responseText = response.response.text();
           
           result.result = responseText;
@@ -145,19 +137,20 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           }
           
           // Limit text size
-          if (text.length > 5000) {
-            text = text.substring(0, 2500) + '...' + text.substring(text.length - 2500);
+          if (text.length > 8000) {
+            text = text.substring(0, 4000) + '...' + text.substring(text.length - 4000);
           }
           
           // Create prompt
           const prompt = `Analyze this ${result.fileType} for ${userRole === 'Doctor' ? 'healthcare professional' : 'patient'}.
           
-          Content extract: ${text}
+          Content:
+          ${text}
           
-          Context: ${additionalInfo}
+          Additional context: ${additionalInfo}
           
           Provide concise insights focusing on key findings, abnormal values, and actionable recommendations.
-          Keep your response under 300 words.`;
+          Keep your response comprehensive but focused.`;
           
           // Make API request
           const response = await model.generateContent(prompt);
@@ -192,7 +185,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
 const parseForm = async (req: NextApiRequest): Promise<{ fields: formidable.Fields, files: formidable.Files }> => {
   return new Promise((resolve, reject) => {
-    const uploadDir = '/tmp/uploads/temp'; // Changed this line
+    const uploadDir = '/tmp/uploads/temp';
     
     // Ensure directory exists
     try {
