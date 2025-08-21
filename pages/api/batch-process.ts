@@ -14,6 +14,7 @@ import {
   extractTextFromPDF,
   getFileType
 } from '@/utils/file-helpers';
+import { BatchResult } from '@/lib/types';
 
 export const config = {
   api: {
@@ -65,17 +66,17 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     });
 
     // Process each file
-    const results = [];
+    const results: BatchResult[] = [];
     const uploadedFiles = Array.isArray(files.files) ? files.files : [files.files];
 
     for (const file of uploadedFiles) {
       const fileName = file.originalFilename || path.basename(file.filepath);
       const fileType = getFileType(fileName);
       
-      const result = {
+      const result: BatchResult = {
         fileName,
         fileType: determineReportType(fileType, reportType),
-        status: 'Processing' as const,
+        status: 'Processing',
         result: ''
       };
       
