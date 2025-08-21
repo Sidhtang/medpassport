@@ -1,0 +1,88 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --foreground-rgb: 0, 0, 0;
+  --background-rgb: 250, 250, 250;
+}
+
+body {
+  color: rgb(var(--foreground-rgb));
+  background: rgb(var(--background-rgb));
+}
+
+.prose h1 {
+  @apply text-2xl font-bold mb-4;
+}
+
+.prose h2 {
+  @apply text-xl font-semibold mb-3;
+}
+
+.prose h3 {
+  @apply text-lg font-medium mb-2;
+}
+
+.prose ul {
+  @apply list-disc pl-5 mb-4;
+}
+
+.prose ol {
+  @apply list-decimal pl-5 mb-4;
+}
+
+.prose p {
+  @apply mb-4;
+}
+
+.prose pre {
+  @apply p-2 bg-gray-100 rounded overflow-x-auto mb-4;
+}
+
+.markdown-body h1 {
+  @apply text-2xl font-bold mb-4;
+}
+
+.markdown-body h2 {
+  @apply text-xl font-semibold mb-3;
+}
+
+.markdown-body h3 {
+  @apply text-lg font-medium mb-2;
+}
+
+.markdown-body ul {
+  @apply list-disc pl-5 mb-4;
+}
+
+.markdown-body ol {
+  @apply list-decimal pl-5 mb-4;
+}
+
+.markdown-body p {
+  @apply mb-4;
+}
+
+.markdown-body pre {
+  @apply p-2 bg-gray-100 rounded overflow-x-auto mb-4;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #c0c0c0;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #a0a0a0;
+}
