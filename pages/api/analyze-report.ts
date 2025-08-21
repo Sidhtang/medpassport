@@ -59,8 +59,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     // Limit text size
-    if (reportText.length > 5000) {
-      reportText = reportText.substring(0, 1000) + '...' + reportText.substring(reportText.length - 1000);
+    if (reportText.length > 8000) {
+      reportText = reportText.substring(0, 4000) + '...' + reportText.substring(reportText.length - 4000);
     }
     
     // Check cache
@@ -71,23 +71,34 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return res.status(200).json({ result: cachedResult });
     }
 
-    // Call Gemini API
+    // Call Gemini API - Updated to use Gemini 2.0
     const genAI = initializeGemini(apiKey);
     const model = genAI.getGenerativeModel({
-      model: 'gemini-1.0-pro',
+      model: 'gemini-2.0-flash', // Updated to stable Gemini 2.0 Flash
       generationConfig: {
         temperature: 0.4,
         topP: 0.8,
         topK: 40,
-        maxOutputTokens: 1024,
+        maxOutputTokens: 2048, // Increased for better responses
       },
     });
 
     // Create prompt
     let prompt = `Analyze ${reportType} for ${userRole === 'Doctor' ? 'healthcare professional' : 'patient'}.
-    Report extract: ${reportText.substring(0, 2000)}...
-    Context: ${additionalInfo ? additionalInfo : 'None'}
-    Provide only key findings, abnormal values, and actionable insights.
+    
+    Report content:
+    ${reportText}
+    
+    Additional context: ${additionalInfo ? additionalInfo : 'None'}
+    
+    Please provide a comprehensive analysis focusing on:
+    1. Key findings and abnormal values
+    2. Clinical significance of results
+    3. Potential implications for health
+    4. Recommended follow-up actions
+    5. Any urgent concerns that need immediate attention
+    
+    Format your response clearly and highlight important findings in **bold text**.
     `;
     
     if (userRole === 'Doctor') {
@@ -123,7 +134,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
 const parseForm = async (req: NextApiRequest): Promise<{ fields: formidable.Fields, files: formidable.Files }> => {
   return new Promise((resolve, reject) => {
-    const uploadDir = '/tmp/uploads/temp'; // Changed this line
+    const uploadDir = '/tmp/uploads/temp';
     
     // Ensure directory exists
     try {
