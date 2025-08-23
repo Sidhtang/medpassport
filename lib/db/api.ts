@@ -10,7 +10,7 @@ export async function getPreviousAnalysisResults(): Promise<AnalysisResult[]> {
       take: 10
     });
     
-    return results.map(r => ({
+    return results.map((r: { result: string }) => ({
       result: r.result,
       error: undefined
     }));
