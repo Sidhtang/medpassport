@@ -1,9 +1,8 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import NewLayout from '@/components/layout/NewLayout';
 import Link from 'next/link';
 import Image from 'next/image';
-
 import { 
   ImageIcon, 
   ReportIcon, 
@@ -19,20 +18,6 @@ import {
   LanguageIcon
 } from '@/components/ui/Icons';
 
-import { 
-  MedicalCrossIcon, 
-  HeartRateIcon, 
-  DnaIcon, 
-  MicroscopeIcon,
-  PulseIcon,
-  HospitalIcon,
-  StethoscopeIcon,
-  XRayIcon,
-  ClipboardMedicalIcon,
-  HealthShieldIcon,
-  ActivityGraphIcon
-} from '@/components/ui/HealthIcons';
-
 // Import existing components
 import ImageAnalysisTab from '@/components/ImageAnalysisTab';
 import ReportAnalysisTab from '@/components/ReportAnalysisTab';
@@ -42,11 +27,10 @@ import NetworkDiagnosticsTab from '@/components/NetworkDiagnosticsTab';
 
 export default function Home() {
   // State from original app
-  const [activeTab, setActiveTab] = useState('imageAnalysis');
-  const [userRole, setUserRole] = useState('Patient');
-  const [apiKey, setApiKey] = useState(process.env.NEXT_PUBLIC_GEMINI_API_KEY || '');
-  const [debugMode, setDebugMode] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const [activeTab, setActiveTab] = useState<string>('imageAnalysis');
+  const [userRole, setUserRole] = useState<string>('Patient');
+  const [apiKey, setApiKey] = useState<string>(process.env.NEXT_PUBLIC_GEMINI_API_KEY || '');
+  const [debugMode, setDebugMode] = useState<boolean>(false);
   const router = useRouter();
   
   // Handle tab changes from URL parameter
@@ -75,13 +59,107 @@ export default function Home() {
     }
   }, [router.isReady, router.query]);
 
+  // Help Information Tab Component
+  const HelpInformationTab: React.FC = () => {
+    return (
+      <div className="space-y-6">
+        <section>
+          <h2 className="text-xl font-semibold mb-3">About this Tool</h2>
+          <p>This Medical Report Analysis Tool uses Google's Gemini 2.0 AI model to provide insights on medical reports, images, audio, and video files.</p>
+          <div className="mt-3 p-3 bg-yellow-50 border border-yellow-200 rounded">
+            <h3 className="font-medium">Important Notes:</h3>
+            <ul className="list-disc pl-5 mt-2 space-y-1">
+              <li>This tool is intended as a supplementary aid and should not replace professional medical advice.</li>
+              <li>All analyses should be reviewed by healthcare professionals.</li>
+              <li>The AI may occasionally misinterpret medical data; always verify findings with your doctor.</li>
+              <li>Audio/video analysis requires appropriate permissions for recording features.</li>
+            </ul>
+          </div>
+        </section>
+
+        <section>
+          <h2 className="text-xl font-semibold mb-3">New Audio & Video Analysis Features</h2>
+          <div className="grid md:grid-cols-2 gap-4">
+            <div className="p-4 bg-blue-50 border rounded">
+              <h3 className="font-medium mb-2">🫀 Heart & Lung Sounds</h3>
+              <p className="text-sm">Analyze cardiac and pulmonary auscultation recordings for murmurs, rhythms, and breathing patterns.</p>
+            </div>
+            <div className="p-4 bg-green-50 border rounded">
+              <h3 className="font-medium mb-2">🗣️ Voice Analysis</h3>
+              <p className="text-sm">Evaluate speech patterns, voice quality, and neurological speech indicators.</p>
+            </div>
+            <div className="p-4 bg-purple-50 border rounded">
+              <h3 className="font-medium mb-2">📹 Ultrasound Videos</h3>
+              <p className="text-sm">Analyze dynamic ultrasound imaging and real-time medical examinations.</p>
+            </div>
+            <div className="p-4 bg-orange-50 border rounded">
+              <h3 className="font-medium mb-2">🚶 Movement Analysis</h3>
+              <p className="text-sm">Assess gait patterns, movement disorders, and physical examination videos.</p>
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <h2 className="text-xl font-semibold mb-3">How to Use</h2>
+          <ol className="list-decimal pl-5 space-y-2">
+            <li><strong>Select your role</strong> (Patient or Doctor) to receive appropriately formatted analysis.</li>
+            <li><strong>Choose the appropriate tab</strong> for your content type (Images, Reports, Audio/Video).</li>
+            <li><strong>Upload files or use recording</strong> features for audio/video analysis.</li>
+            <li><strong>Provide clinical context</strong> about symptoms or medical history for more relevant analysis.</li>
+            <li><strong>Click Analyze</strong> to generate AI-powered insights.</li>
+            <li><strong>Download PDF reports</strong> or save the analysis for future reference.</li>
+            <li><strong>For multiple files</strong>, use the Batch Processing tab.</li>
+          </ol>
+        </section>
+
+        <section>
+          <h2 className="text-xl font-semibold mb-3">Supported File Types</h2>
+          <div className="grid md:grid-cols-3 gap-4">
+            <div>
+              <h3 className="font-medium mb-2">📷 Images</h3>
+              <p className="text-sm text-gray-600">JPG, PNG, GIF, BMP, WebP</p>
+            </div>
+            <div>
+              <h3 className="font-medium mb-2">📄 Documents</h3>
+              <p className="text-sm text-gray-600">PDF, TXT, DOC, DOCX</p>
+            </div>
+            <div>
+              <h3 className="font-medium mb-2">🎵 Audio</h3>
+              <p className="text-sm text-gray-600">MP3, WAV, OGG, M4A, AAC, FLAC</p>
+            </div>
+            <div>
+              <h3 className="font-medium mb-2">🎥 Video</h3>
+              <p className="text-sm text-gray-600">MP4, AVI, MOV, WebM, MKV</p>
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <h2 className="text-xl font-semibold mb-3">Privacy & Security</h2>
+          <ul className="list-disc pl-5 mt-2 space-y-1">
+            <li>Audio/video recordings are processed securely via Google's Gemini 2.0 API</li>
+            <li>Files are temporarily stored only during processing</li>
+            <li>No permanent storage of sensitive medical data</li>
+            <li>Microphone/camera permissions are only requested when using recording features</li>
+            <li>All data transmission is encrypted</li>
+          </ul>
+        </section>
+
+        <section>
+          <h2 className="text-xl font-semibold mb-3">Disclaimer</h2>
+          <p className="p-3 bg-red-50 border border-red-200 rounded">
+            This tool is not FDA approved and is provided for informational purposes only.
+            It does not establish a doctor-patient relationship, provide medical advice,
+            or substitute for professional medical consultation, diagnosis, or treatment.
+            Audio and video analysis features are experimental and should be used with caution.
+          </p>
+        </section>
+      </div>
+    );
+  };
+
   // Function to render active component
   const renderActiveComponent = () => {
-    setIsLoading(true);
-    setTimeout(() => {
-      setIsLoading(false);
-    }, 800); // Simulate loading for better UX
-
     switch (activeTab) {
       case 'imageAnalysis':
         return <ImageAnalysisTab apiKey={apiKey} userRole={userRole} />;
@@ -93,349 +171,426 @@ export default function Home() {
         return <BatchProcessingTab apiKey={apiKey} userRole={userRole} />;
       case 'networkDiagnostics':
         return <NetworkDiagnosticsTab />;
+      case 'help':
+        return <HelpInformationTab />;
       default:
         return <ImageAnalysisTab apiKey={apiKey} userRole={userRole} />;
     }
   };
 
   return (
-    <NewLayout>
+    <NewLayout pageTitle="MedPassport - AI-Powered Medical Analysis">
       {/* Hero Section */}
-      <div className="py-12 md:py-20 animate-slide-up">
-        <div className="max-w-4xl mx-auto text-center">
-          <div className="inline-block p-2 bg-primary-100 rounded-full mb-4">
-            <MedicalCrossIcon className="h-8 w-8 text-primary-600 animate-pulse-gentle" />
+      <div className="flex flex-col md:flex-row items-center gap-8 px-4 py-12">
+        <div className="flex-1 flex flex-col justify-center items-start gap-6">
+          <div className="flex items-center gap-2 px-3 py-1.5 bg-primary-100 rounded-full">
+            <span className="w-2 h-2 bg-primary-600 rounded-full"></span>
+            <span className="text-primary-700 text-sm font-medium">AI-Powered Healthcare</span>
           </div>
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-primary-900 mb-6">
-            Medical Document Analysis Made <span className="text-primary-600">Simple</span>
+          <h1 className="text-4xl md:text-5xl lg:text-[56px] font-extrabold leading-tight text-text-dark">
+            AI-Powered Medical <span className="text-primary-600">Report Analysis</span>
           </h1>
-          <p className="text-lg md:text-xl text-text-dark max-w-3xl mx-auto mb-10">
-            Upload medical images, reports, and audio/video for AI-powered analysis. Get instant insights in simple language.
+          <p className="text-lg text-text-muted max-w-lg">
+            Upload medical reports, images, and recordings to get instant AI analysis in simple language. 
+            Available for both patients and healthcare professionals.
           </p>
-          <div className="flex flex-wrap justify-center gap-4">
-            <button 
-              className="px-6 py-3 bg-primary-500 hover:bg-primary-600 text-white rounded-xl font-semibold transition-all duration-300 shadow-lg hover:shadow-primary-glow transform hover:-translate-y-0.5"
-              onClick={() => setActiveTab('imageAnalysis')}
-            >
-              Start Analyzing
+          <div className="flex gap-4 mt-4">
+            <button className="h-12 px-6 bg-primary-500 hover:bg-primary-600 active:bg-primary-700 text-white rounded-lg font-semibold text-base transition-colors shadow-md hover:shadow-lg flex items-center gap-2">
+              Get Started
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M4.16669 10H15.8334" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M10 4.16669L15.8333 10L10 15.8334" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
             </button>
-            <button 
-              className="px-6 py-3 bg-white border border-neutral-200 hover:bg-neutral-50 text-text-dark rounded-xl font-semibold transition-all duration-300 shadow hover:shadow-md transform hover:-translate-y-0.5"
-            >
-              See How It Works
+            <button className="h-12 px-6 border border-neutral-200 text-text-dark hover:bg-neutral-100 rounded-lg font-semibold text-base transition-colors">
+              See Demo
             </button>
+          </div>
+        </div>
+        <div className="flex-1 relative h-[380px] w-full">
+          <div className="w-full h-full bg-gradient-to-br from-primary-100 to-success-100 rounded-2xl flex items-center justify-center shadow-lg overflow-hidden">
+            <div className="relative w-4/5 h-4/5">
+              <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[280px] h-[280px] bg-white rounded-full shadow-inner"></div>
+              <div className="absolute top-1/4 left-1/4 w-12 h-12 bg-success-500 rounded-full animate-pulse"></div>
+              <div className="absolute bottom-1/4 right-1/3 w-16 h-16 bg-primary-500 rounded-full animate-pulse delay-300"></div>
+              <div className="absolute top-1/2 right-1/4 w-10 h-10 bg-primary-600 rounded-full animate-pulse delay-100"></div>
+              <div className="absolute bottom-1/3 left-1/3 w-14 h-14 bg-success-600 rounded-full animate-pulse delay-200"></div>
+              {/* Illustration could be placed here */}
+              <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-text-muted">Medical Analysis Illustration</div>
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Features Section with Healthcare Icons */}
-      <div className="py-16 md:py-20 bg-gradient-to-b from-white to-primary-50 animate-fade-in">
-        <div className="max-w-6xl mx-auto px-4">
-          <h2 className="text-3xl md:text-4xl font-bold text-primary-800 text-center mb-12">
-            Complete Medical Document Analysis
-          </h2>
-          
-          <div className="grid md:grid-cols-3 gap-8">
-            <div className="bg-white rounded-2xl p-6 border border-neutral-200 shadow-card transition-all duration-300 hover:shadow-card-hover transform hover:-translate-y-1">
-              <div className="bg-healing-50 p-3 rounded-xl inline-flex mb-4">
-                <XRayIcon className="h-8 w-8 text-healing-600" />
+      {/* Role Selection */}
+      <div className="px-4 pt-16 pb-4">
+        <h2 className="text-2xl font-bold text-text-dark text-center mb-8">Choose Your Role</h2>
+        <div className="flex flex-col md:flex-row gap-6 justify-center max-w-[800px] mx-auto">
+          <div 
+            className={`flex-1 p-6 border-2 rounded-xl cursor-pointer transition-all ${
+              userRole === 'Patient' 
+                ? 'border-primary-500 bg-primary-50 shadow-md' 
+                : 'border-neutral-200 hover:border-primary-300 hover:shadow'
+            }`}
+            onClick={() => setUserRole('Patient')}
+          >
+            <div className="flex flex-col items-center gap-4 text-center">
+              <div className={`p-4 rounded-full ${userRole === 'Patient' ? 'bg-primary-100' : 'bg-neutral-100'}`}>
+                <PatientIcon />
               </div>
-              <h3 className="text-xl font-semibold text-text-dark mb-3">Medical Image Analysis</h3>
+              <h3 className="text-xl font-semibold text-text-dark">Patient</h3>
               <p className="text-text-muted">
-                Advanced AI for X-rays, MRIs, CT scans, and other medical imaging with detailed explanation.
-              </p>
-            </div>
-
-            <div className="bg-white rounded-2xl p-6 border border-neutral-200 shadow-card transition-all duration-300 hover:shadow-card-hover transform hover:-translate-y-1">
-              <div className="bg-primary-50 p-3 rounded-xl inline-flex mb-4">
-                <ClipboardMedicalIcon className="h-8 w-8 text-primary-600" />
-              </div>
-              <h3 className="text-xl font-semibold text-text-dark mb-3">Report Analysis</h3>
-              <p className="text-text-muted">
-                Extract and explain key information from lab reports, diagnoses, and discharge summaries.
-              </p>
-            </div>
-
-            <div className="bg-white rounded-2xl p-6 border border-neutral-200 shadow-card transition-all duration-300 hover:shadow-card-hover transform hover:-translate-y-1">
-              <div className="bg-mint-50 p-3 rounded-xl inline-flex mb-4">
-                <HeartRateIcon className="h-8 w-8 text-mint-600" />
-              </div>
-              <h3 className="text-xl font-semibold text-text-dark mb-3">Audio & Video Analysis</h3>
-              <p className="text-text-muted">
-                Analyze heart sounds, breathing patterns, and medical consultations through audio and video.
+                I want to understand my medical reports and get simplified explanations of my health data.
               </p>
             </div>
           </div>
-          
-          <div className="flex justify-center mt-12">
-            <button className="group flex items-center gap-2 px-6 py-3 bg-white border border-primary-200 hover:border-primary-300 rounded-xl text-primary-700 font-medium transition-all duration-300 shadow hover:shadow-md">
-              <span>Learn More About Features</span>
-              <span className="transform group-hover:translate-x-1 transition-transform duration-300">→</span>
-            </button>
+
+          <div 
+            className={`flex-1 p-6 border-2 rounded-xl cursor-pointer transition-all ${
+              userRole === 'Doctor' 
+                ? 'border-primary-500 bg-primary-50 shadow-md' 
+                : 'border-neutral-200 hover:border-primary-300 hover:shadow'
+            }`}
+            onClick={() => setUserRole('Doctor')}
+          >
+            <div className="flex flex-col items-center gap-4 text-center">
+              <div className={`p-4 rounded-full ${userRole === 'Doctor' ? 'bg-primary-100' : 'bg-neutral-100'}`}>
+                <DoctorIcon />
+              </div>
+              <h3 className="text-xl font-semibold text-text-dark">Doctor</h3>
+              <p className="text-text-muted">
+                I need detailed analysis and medical insights to assist with patient diagnosis and treatment.
+              </p>
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Medical Analysis Tabs */}
-      <div className="py-12">
-        <div className="max-w-5xl mx-auto px-4">
-          <div className="flex flex-wrap gap-2 justify-center mb-8">
-            <button
-              className={`px-5 py-3 rounded-lg text-sm font-medium transition-all duration-300 ${
-                activeTab === 'imageAnalysis'
-                  ? 'bg-primary-500 text-white shadow-primary-glow'
-                  : 'bg-white text-text-muted hover:bg-primary-50'
-              }`}
-              onClick={() => setActiveTab('imageAnalysis')}
-            >
-              <div className="flex items-center gap-2">
-                <ImageIcon />
-                <span>Image Analysis</span>
+      {/* API Key Input */}
+      <div className="px-4 py-10">
+        <div className="max-w-[600px] mx-auto">
+          <div className="flex flex-col gap-3">
+            <div className="flex items-center gap-2">
+              <ApiKeyIcon />
+              <h3 className="text-lg font-semibold text-text-dark">Enter your API key</h3>
+            </div>
+            <div className="flex items-center gap-2 border border-neutral-200 rounded-lg overflow-hidden">
+              <div className="p-3 bg-neutral-50">
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M16.6667 5H3.33333C2.41286 5 1.66667 5.74619 1.66667 6.66667V13.3333C1.66667 14.2538 2.41286 15 3.33333 15H16.6667C17.5871 15 18.3333 14.2538 18.3333 13.3333V6.66667C18.3333 5.74619 17.5871 5 16.6667 5Z" stroke="#475569" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                  <path d="M1.66667 8.33334H18.3333" stroke="#475569" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
               </div>
-            </button>
-            
-            <button
-              className={`px-5 py-3 rounded-lg text-sm font-medium transition-all duration-300 ${
-                activeTab === 'reportAnalysis'
-                  ? 'bg-healing-500 text-white shadow-healing-glow'
-                  : 'bg-white text-text-muted hover:bg-healing-50'
-              }`}
-              onClick={() => setActiveTab('reportAnalysis')}
-            >
-              <div className="flex items-center gap-2">
-                <ReportIcon />
-                <span>Report Analysis</span>
-              </div>
-            </button>
-            
-            <button
-              className={`px-5 py-3 rounded-lg text-sm font-medium transition-all duration-300 ${
-                activeTab === 'audioVideoAnalysis'
-                  ? 'bg-mint-500 text-white shadow-md'
-                  : 'bg-white text-text-muted hover:bg-mint-50'
-              }`}
-              onClick={() => setActiveTab('audioVideoAnalysis')}
-            >
-              <div className="flex items-center gap-2">
-                <AudioVideoIcon />
-                <span>Audio/Video Analysis</span>
-              </div>
-            </button>
-            
-            <button
-              className={`px-5 py-3 rounded-lg text-sm font-medium transition-all duration-300 ${
-                activeTab === 'batchProcessing'
-                  ? 'bg-primary-500 text-white shadow-md'
-                  : 'bg-white text-text-muted hover:bg-primary-50'
-              }`}
-              onClick={() => setActiveTab('batchProcessing')}
-            >
-              <div className="flex items-center gap-2">
-                <BatchIcon />
-                <span>Batch Processing</span>
-              </div>
-            </button>
-            
-            <button
-              className={`px-5 py-3 rounded-lg text-sm font-medium transition-all duration-300 ${
-                activeTab === 'networkDiagnostics'
-                  ? 'bg-primary-500 text-white shadow-md'
-                  : 'bg-white text-text-muted hover:bg-primary-50'
-              }`}
-              onClick={() => setActiveTab('networkDiagnostics')}
-            >
-              <div className="flex items-center gap-2">
-                <DnaIcon className="h-5 w-5" />
-                <span>Network Diagnostics</span>
-              </div>
-            </button>
+              <input
+                type="password"
+                placeholder="Paste your API key here"
+                className="w-full p-3 outline-none text-text-dark"
+                value={apiKey}
+                onChange={(e) => setApiKey(e.target.value)}
+              />
+              <button className="p-3 text-primary-500 font-medium">
+                Apply
+              </button>
+            </div>
+            <p className="text-sm text-text-light">Don't have an API key? <a href="https://ai.google.dev/tutorials/setup" target="_blank" rel="noopener noreferrer" className="text-primary-500 hover:underline">Get one here</a>.</p>
+          </div>
+        </div>
+      </div>
+      
+      {/* Existing Functionality Container */}
+      <div className="mt-8 px-4 py-6 bg-white border border-neutral-200 rounded-xl shadow-sm">
+        <div className="flex items-center gap-2 mb-6">
+          <div className="w-2 h-6 bg-primary-600 rounded-full"></div>
+          <h2 className="text-xl font-semibold text-text-dark">Active Component</h2>
+        </div>
+        
+        {/* Tabs Navigation */}
+        <div className="flex flex-wrap gap-2 mb-6">
+          <button 
+            onClick={() => {
+              setActiveTab('imageAnalysis');
+              router.push('/?tab=image', undefined, { shallow: true });
+            }}
+            className={`px-4 py-2 rounded-lg font-medium text-sm transition-colors ${
+              activeTab === 'imageAnalysis' 
+                ? 'bg-primary-500 text-white' 
+                : 'bg-neutral-100 text-text-dark hover:bg-neutral-200'
+            }`}
+          >
+            <div className="flex items-center gap-2">
+              <ImageIcon />
+              <span>Image Analysis</span>
+            </div>
+          </button>
+          
+          <button 
+            onClick={() => {
+              setActiveTab('reportAnalysis');
+              router.push('/?tab=report', undefined, { shallow: true });
+            }}
+            className={`px-4 py-2 rounded-lg font-medium text-sm transition-colors ${
+              activeTab === 'reportAnalysis' 
+                ? 'bg-primary-500 text-white' 
+                : 'bg-neutral-100 text-text-dark hover:bg-neutral-200'
+            }`}
+          >
+            <div className="flex items-center gap-2">
+              <ReportIcon />
+              <span>Report Analysis</span>
+            </div>
+          </button>
+          
+          <button 
+            onClick={() => {
+              setActiveTab('audioVideoAnalysis');
+              router.push('/?tab=audio-video', undefined, { shallow: true });
+            }}
+            className={`px-4 py-2 rounded-lg font-medium text-sm transition-colors ${
+              activeTab === 'audioVideoAnalysis' 
+                ? 'bg-primary-500 text-white' 
+                : 'bg-neutral-100 text-text-dark hover:bg-neutral-200'
+            }`}
+          >
+            <div className="flex items-center gap-2">
+              <AudioVideoIcon />
+              <span>Audio/Video Analysis</span>
+            </div>
+          </button>
+          
+          <button 
+            onClick={() => {
+              setActiveTab('batchProcessing');
+              router.push('/?tab=batch', undefined, { shallow: true });
+            }}
+            className={`px-4 py-2 rounded-lg font-medium text-sm transition-colors ${
+              activeTab === 'batchProcessing' 
+                ? 'bg-primary-500 text-white' 
+                : 'bg-neutral-100 text-text-dark hover:bg-neutral-200'
+            }`}
+          >
+            <div className="flex items-center gap-2">
+              <BatchIcon />
+              <span>Batch Processing</span>
+            </div>
+          </button>
+          
+          <button 
+            onClick={() => {
+              setActiveTab('networkDiagnostics');
+              router.push('/?tab=diagnostics', undefined, { shallow: true });
+            }}
+            className={`px-4 py-2 rounded-lg font-medium text-sm transition-colors ${
+              activeTab === 'networkDiagnostics' 
+                ? 'bg-primary-500 text-white' 
+                : 'bg-neutral-100 text-text-dark hover:bg-neutral-200'
+            }`}
+          >
+            <div className="flex items-center gap-2">
+              <span>Diagnostics</span>
+            </div>
+          </button>
+        </div>
+        
+        {/* Component Container */}
+        <div className="mt-6 p-4 border border-neutral-200 rounded-lg bg-neutral-50">
+          {renderActiveComponent()}
+        </div>
+      </div>
+
+      {/* Main Menu */}
+      <div className="px-4 pt-10 pb-6">
+        <h2 className="text-2xl font-bold text-text-dark mb-2">Main Menu</h2>
+        <p className="text-text-muted mb-8">Choose a service to get started with your medical analysis</p>
+      </div>
+      
+      {/* Menu Cards - Modern Grid Layout */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 px-4">
+        <Link href="/?tab=image" className="group p-5 bg-white border border-neutral-200 rounded-xl hover:shadow-md transition-all hover:border-primary-300">
+          <div className="flex flex-col gap-4">
+            <div className="p-3 bg-primary-50 rounded-lg w-fit group-hover:bg-primary-100 transition-colors">
+              <ImageIcon />
+            </div>
+            <div>
+              <h3 className="text-lg font-semibold text-text-dark group-hover:text-primary-600 transition-colors">Medical Image Analysis</h3>
+              <p className="text-text-muted mt-1">Upload X-rays, MRIs, CT scans, and other medical images for AI analysis</p>
+            </div>
+          </div>
+        </Link>
+        
+        <Link href="/?tab=report" className="group p-5 bg-white border border-neutral-200 rounded-xl hover:shadow-md transition-all hover:border-primary-300">
+          <div className="flex flex-col gap-4">
+            <div className="p-3 bg-primary-50 rounded-lg w-fit group-hover:bg-primary-100 transition-colors">
+              <ReportIcon />
+            </div>
+            <div>
+              <h3 className="text-lg font-semibold text-text-dark group-hover:text-primary-600 transition-colors">PDF & Lab Reports</h3>
+              <p className="text-text-muted mt-1">Upload lab results, clinical notes, and other medical documents</p>
+            </div>
+          </div>
+        </Link>
+        
+        <Link href="/?tab=batch" className="group p-5 bg-white border border-neutral-200 rounded-xl hover:shadow-md transition-all hover:border-primary-300">
+          <div className="flex flex-col gap-4">
+            <div className="p-3 bg-primary-50 rounded-lg w-fit group-hover:bg-primary-100 transition-colors">
+              <BatchIcon />
+            </div>
+            <div>
+              <h3 className="text-lg font-semibold text-text-dark group-hover:text-primary-600 transition-colors">Batch Processing</h3>
+              <p className="text-text-muted mt-1">Process multiple reports simultaneously for faster analysis</p>
+            </div>
+          </div>
+        </Link>
+        
+        <Link href="/?tab=audio-video" className="group p-5 bg-white border border-neutral-200 rounded-xl hover:shadow-md transition-all hover:border-primary-300">
+          <div className="flex flex-col gap-4">
+            <div className="p-3 bg-primary-50 rounded-lg w-fit group-hover:bg-primary-100 transition-colors">
+              <AudioVideoIcon />
+            </div>
+            <div>
+              <h3 className="text-lg font-semibold text-text-dark group-hover:text-primary-600 transition-colors">Audio & Video</h3>
+              <p className="text-text-muted mt-1">Analyze medical conversations, consultations, and procedures</p>
+            </div>
+          </div>
+        </Link>
+      </div>
+
+      {/* Upload Section */}
+      <div className="mt-16 px-4">
+        <div className="max-w-[1000px] mx-auto bg-white border border-neutral-200 rounded-xl overflow-hidden shadow-sm">
+          <div className="px-6 py-4 bg-primary-50 border-b border-neutral-200">
+            <h2 className="text-xl font-semibold text-text-dark">Upload Medical Documents</h2>
           </div>
           
-          <div className="bg-white border border-neutral-200 rounded-xl p-6 shadow-card animate-fade-in">
-            {isLoading ? (
-              <div className="py-20 flex flex-col items-center justify-center">
-                <div className="mb-4">
-                  <div className="animate-spin h-12 w-12 text-primary-500">
-                    <MedicalCrossIcon className="h-full w-full" />
+          <div className="p-6">
+            <div className="border-2 border-dashed border-neutral-200 rounded-lg p-10 flex flex-col items-center justify-center gap-4">
+              <div className="p-4 bg-primary-50 rounded-full">
+                <UploadIcon />
+              </div>
+              <div className="text-center">
+                <h3 className="text-lg font-medium text-text-dark">Drop your files here</h3>
+                <p className="text-text-muted mt-2">Support for JPEG, PNG, PDF, DICOM</p>
+              </div>
+              <button className="mt-2 px-5 py-2 bg-primary-500 hover:bg-primary-600 text-white rounded-lg font-medium text-sm transition-colors">
+                Browse Files
+              </button>
+            </div>
+
+            <div className="mt-8 flex flex-col md:flex-row gap-6">
+              <div className="flex-1">
+                <div className="flex items-center gap-2 mb-3">
+                  <LanguageIcon />
+                  <h3 className="font-medium text-text-dark">Select Language</h3>
+                </div>
+                <div className="relative">
+                  <select className="w-full p-3 bg-neutral-50 border border-neutral-200 rounded-lg appearance-none pr-10">
+                    <option>English</option>
+                    <option>Spanish</option>
+                    <option>French</option>
+                    <option>German</option>
+                    <option>Chinese</option>
+                  </select>
+                  <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M4 6L8 10L12 6" stroke="#475569" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
                   </div>
                 </div>
-                <p className="text-text-muted">Loading analysis tools...</p>
               </div>
-            ) : (
-              renderActiveComponent()
-            )}
-          </div>
-        </div>
-      </div>
-
-      {/* Role Selection with Enhanced UI */}
-      <div className="py-16 bg-gradient-to-b from-primary-50 to-white">
-        <div className="max-w-5xl mx-auto px-4">
-          <h2 className="text-3xl font-bold text-primary-800 text-center mb-2">Choose Your Role</h2>
-          <p className="text-text-muted text-center mb-10 max-w-xl mx-auto">Personalized experience based on whether you're a patient or healthcare professional</p>
-          
-          <div className="flex flex-col md:flex-row gap-8 justify-center">
-            <div 
-              className={`relative group flex-1 p-8 border-2 rounded-xl cursor-pointer transition-all duration-300 overflow-hidden ${
-                userRole === 'Patient' 
-                  ? 'border-primary-500 bg-primary-50 shadow-md' 
-                  : 'border-neutral-200 hover:border-primary-300 hover:shadow bg-white'
-              }`}
-              onClick={() => setUserRole('Patient')}
-            >
-              <div className="absolute -right-10 -top-10 h-40 w-40 bg-primary-100 rounded-full opacity-30 group-hover:scale-150 transition-transform duration-500"></div>
               
-              <div className="relative z-10 flex flex-col items-center gap-4 text-center">
-                <div className={`p-4 rounded-full ${userRole === 'Patient' ? 'bg-primary-100' : 'bg-neutral-100'}`}>
-                  <PatientIcon />
-                </div>
-                <h3 className="text-xl font-semibold text-text-dark">Patient</h3>
-                <p className="text-text-muted">
-                  I want to understand my medical reports and get simplified explanations of my health data.
-                </p>
-                <div className="mt-4 h-1 w-20 bg-primary-500 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-              </div>
-            </div>
-
-            <div 
-              className={`relative group flex-1 p-8 border-2 rounded-xl cursor-pointer transition-all duration-300 overflow-hidden ${
-                userRole === 'Healthcare Professional' 
-                  ? 'border-healing-500 bg-healing-50 shadow-md' 
-                  : 'border-neutral-200 hover:border-healing-300 hover:shadow bg-white'
-              }`}
-              onClick={() => setUserRole('Healthcare Professional')}
-            >
-              <div className="absolute -right-10 -top-10 h-40 w-40 bg-healing-100 rounded-full opacity-30 group-hover:scale-150 transition-transform duration-500"></div>
-              
-              <div className="relative z-10 flex flex-col items-center gap-4 text-center">
-                <div className={`p-4 rounded-full ${userRole === 'Healthcare Professional' ? 'bg-healing-100' : 'bg-neutral-100'}`}>
-                  <DoctorIcon />
-                </div>
-                <h3 className="text-xl font-semibold text-text-dark">Healthcare Professional</h3>
-                <p className="text-text-muted">
-                  I need detailed analysis with medical terminology and comprehensive insights.
-                </p>
-                <div className="mt-4 h-1 w-20 bg-healing-500 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+              <div className="flex-1">
+                <h3 className="font-medium text-text-dark mb-3">Additional Context (Optional)</h3>
+                <textarea 
+                  placeholder="Enter symptoms, medical history, or concerns..."
+                  className="w-full p-3 min-h-[120px] bg-neutral-50 border border-neutral-200 rounded-lg resize-none"
+                ></textarea>
               </div>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Enhanced Upload Section with Drag and Drop */}
-      <div className="py-16 px-4">
-        <div className="max-w-5xl mx-auto">
-          <div className="bg-white border border-neutral-200 rounded-2xl overflow-hidden shadow-card">
-            <div className="px-8 py-5 bg-gradient-to-r from-primary-50 to-primary-100 border-b border-neutral-200">
-              <h2 className="text-2xl font-semibold text-primary-800">Upload Medical Documents</h2>
-            </div>
-            
-            <div className="p-8">
-              <div className="border-2 border-dashed border-neutral-200 rounded-xl p-10 flex flex-col items-center justify-center gap-4 group hover:border-primary-300 transition-colors duration-300">
-                <div className="p-5 bg-primary-50 rounded-full group-hover:scale-110 transition-transform duration-300">
-                  <UploadIcon />
+      {/* Results Section - This is now hidden when using integrated components */}
+      {!activeTab && (
+        <div className="mt-16 px-4 pb-16">
+          <h2 className="text-2xl font-bold text-text-dark mb-6">Analysis Results</h2>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {/* Patient Report */}
+            <div className="bg-white border border-neutral-200 rounded-xl overflow-hidden shadow-sm">
+              <div className="px-6 py-4 bg-primary-50 border-b border-neutral-200">
+                <div className="flex justify-between items-center">
+                  <h3 className="font-semibold text-text-dark flex items-center gap-2">
+                    <PatientIcon />
+                    Patient Report
+                  </h3>
+                  <span className="text-sm text-success-600 font-medium bg-success-50 px-2 py-1 rounded">Simplified</span>
                 </div>
-                <div className="text-center">
-                  <h3 className="text-lg font-medium text-text-dark">Drop your files here</h3>
-                  <p className="text-text-muted mt-2">Drag and drop or click to browse</p>
-                  <p className="text-xs text-text-light mt-1">Supports JPEG, PNG, PDF, DICOM, MP3, MP4</p>
-                </div>
-                <button className="mt-2 px-5 py-2.5 bg-primary-500 hover:bg-primary-600 text-white rounded-lg font-medium text-sm transition-all duration-300 hover:shadow-primary-glow transform hover:-translate-y-0.5">
-                  Browse Files
-                </button>
               </div>
-
-              <div className="mt-10 grid md:grid-cols-2 gap-8">
-                <div className="space-y-4">
-                  <div className="flex items-center gap-2 mb-2">
-                    <LanguageIcon />
-                    <h3 className="font-medium text-text-dark">Analysis Options</h3>
-                  </div>
-                  
-                  <div className="space-y-3">
-                    <div className="flex items-center gap-3">
-                      <input type="checkbox" id="translate" className="rounded text-primary-500 focus:ring-primary-500" />
-                      <label htmlFor="translate" className="text-text-dark">Translate to simple language</label>
-                    </div>
-                    
-                    <div className="flex items-center gap-3">
-                      <input type="checkbox" id="highlight" className="rounded text-primary-500 focus:ring-primary-500" />
-                      <label htmlFor="highlight" className="text-text-dark">Highlight critical findings</label>
-                    </div>
-                    
-                    <div className="flex items-center gap-3">
-                      <input type="checkbox" id="compare" className="rounded text-primary-500 focus:ring-primary-500" />
-                      <label htmlFor="compare" className="text-text-dark">Compare with previous results</label>
-                    </div>
-                  </div>
+              
+              <div className="p-6">
+                <div className="min-h-[200px] bg-neutral-50 rounded-lg flex items-center justify-center">
+                  <span className="text-text-muted">Patient-friendly report will appear here</span>
                 </div>
                 
-                <div className="space-y-4">
-                  <div className="flex items-center gap-2 mb-2">
-                    <ApiKeyIcon />
-                    <h3 className="font-medium text-text-dark">Advanced Settings</h3>
+                <div className="mt-4 flex justify-between">
+                  <div>
+                    <h4 className="font-medium text-text-dark">Key Findings</h4>
+                    <p className="text-sm text-text-muted mt-1">Simplified for patient understanding</p>
                   </div>
-                  
-                  <div className="relative">
-                    <select className="w-full p-3 bg-white border border-neutral-200 rounded-lg appearance-none pr-10 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all">
-                      <option>Default Analysis Mode</option>
-                      <option>Detailed Technical Analysis</option>
-                      <option>Patient-Friendly Summary</option>
-                      <option>Emergency Triage</option>
-                    </select>
-                    <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-text-muted pointer-events-none">
-                      <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M2.5 4.5L6 8L9.5 4.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                      </svg>
-                    </div>
+                  <button className="px-4 py-2 bg-primary-500 hover:bg-primary-600 text-white rounded-lg text-sm font-medium transition-colors">
+                    View Full Report
+                  </button>
+                </div>
+              </div>
+            </div>
+            
+            {/* Doctor Report */}
+            <div className="bg-white border border-neutral-200 rounded-xl overflow-hidden shadow-sm">
+              <div className="px-6 py-4 bg-primary-50 border-b border-neutral-200">
+                <div className="flex justify-between items-center">
+                  <h3 className="font-semibold text-text-dark flex items-center gap-2">
+                    <DoctorIcon />
+                    Doctor Report
+                  </h3>
+                  <span className="text-sm text-primary-600 font-medium bg-primary-50 px-2 py-1 rounded border border-primary-100">Detailed</span>
+                </div>
+              </div>
+              
+              <div className="p-6">
+                <div className="min-h-[200px] bg-neutral-50 rounded-lg flex items-center justify-center">
+                  <span className="text-text-muted">Detailed medical report will appear here</span>
+                </div>
+                
+                <div className="mt-4 flex justify-between">
+                  <div>
+                    <h4 className="font-medium text-text-dark">Clinical Analysis</h4>
+                    <p className="text-sm text-text-muted mt-1">Detailed medical terminology included</p>
                   </div>
-                  
-                  <div className="mt-4">
-                    <button className="w-full px-4 py-3 bg-healing-500 hover:bg-healing-600 text-white rounded-lg font-semibold transition-all duration-300 hover:shadow-healing-glow flex items-center justify-center gap-2">
-                      <ClipboardMedicalIcon className="h-5 w-5" />
-                      <span>Analyze Documents</span>
-                    </button>
-                  </div>
+                  <button className="px-4 py-2 bg-primary-500 hover:bg-primary-600 text-white rounded-lg text-sm font-medium transition-colors">
+                    View Full Report
+                  </button>
                 </div>
               </div>
             </div>
           </div>
-        </div>
-      </div>
-
-      {/* Trust Indicators */}
-      <div className="py-16 bg-gradient-to-b from-white to-primary-50">
-        <div className="max-w-6xl mx-auto px-4 text-center">
-          <h2 className="text-3xl font-bold text-primary-800 mb-3">Trusted by Healthcare Professionals</h2>
-          <p className="text-text-muted max-w-2xl mx-auto mb-12">Our platform maintains the highest standards of medical data security and accuracy</p>
           
-          <div className="grid md:grid-cols-3 gap-8">
-            <div className="bg-white p-6 rounded-xl shadow-card border border-neutral-100">
-              <div className="inline-flex items-center justify-center p-3 bg-primary-50 rounded-full mb-4">
-                <HealthShieldIcon className="h-8 w-8 text-primary-500" />
-              </div>
-              <h3 className="text-xl font-semibold mb-3">HIPAA Compliant</h3>
-              <p className="text-text-muted">Fully compliant with healthcare privacy standards and regulations.</p>
-            </div>
-            
-            <div className="bg-white p-6 rounded-xl shadow-card border border-neutral-100">
-              <div className="inline-flex items-center justify-center p-3 bg-healing-50 rounded-full mb-4">
-                <StethoscopeIcon className="h-8 w-8 text-healing-500" />
-              </div>
-              <h3 className="text-xl font-semibold mb-3">Clinically Validated</h3>
-              <p className="text-text-muted">Analysis tools validated through extensive clinical testing and research.</p>
-            </div>
-            
-            <div className="bg-white p-6 rounded-xl shadow-card border border-neutral-100">
-              <div className="inline-flex items-center justify-center p-3 bg-mint-50 rounded-full mb-4">
-                <ActivityGraphIcon className="h-8 w-8 text-mint-500" />
-              </div>
-              <h3 className="text-xl font-semibold mb-3">Continuous Learning</h3>
-              <p className="text-text-muted">Our AI systems constantly improve through feedback from medical professionals.</p>
-            </div>
+          {/* Action Buttons */}
+          <div className="mt-8 flex justify-center gap-4">
+            <button className="flex items-center gap-2 px-5 py-3 border border-neutral-200 hover:bg-neutral-50 rounded-lg text-text-dark font-medium transition-colors">
+              <ExportIcon />
+              Export
+            </button>
+            <button className="flex items-center gap-2 px-5 py-3 border border-neutral-200 hover:bg-neutral-50 rounded-lg text-text-dark font-medium transition-colors">
+              <DownloadIcon />
+              Download
+            </button>
+            <button className="flex items-center gap-2 px-5 py-3 border border-neutral-200 hover:bg-neutral-50 rounded-lg text-text-dark font-medium transition-colors">
+              <ShareIcon />
+              Share
+            </button>
           </div>
         </div>
-      </div>
+      )}
     </NewLayout>
   );
 }
