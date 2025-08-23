@@ -43,6 +43,15 @@ export interface MedicalReportFormData {
   targetLanguage?: string;
 }
 
+export interface AudioVideoFormData {
+  reportType: string;
+  userRole: string;
+  apiKey?: string;
+  additionalInfo?: string;
+  file?: File;
+  targetLanguage?: string;
+}
+
 export interface BatchProcessFormData {
   reportType: string;
   userRole: string;
@@ -63,5 +72,16 @@ export const SUPPORTED_LANGUAGES = {
 export const REPORT_TYPES = {
   IMAGE_TYPES: ["CT Scan", "MRI", "X-Ray", "Ultrasound", "PET Scan", "Mammogram", "Other Imaging"],
   TEXT_TYPES: ["Blood Work", "Urinalysis", "Pathology Report", "Genetic Test", "Microbiology Report", "Other Lab Test", "Medical PDF"],
-  BATCH_TYPES: ["Mixed (Auto-detect)", "CT Scan", "MRI", "X-Ray", "Blood Work", "Pathology Report"]
+  AUDIO_VIDEO_TYPES: [
+    "Heart Sounds Analysis", 
+    "Lung Sounds Analysis", 
+    "Voice Pattern Analysis",
+    "Ultrasound Video Analysis",
+    "Movement/Gait Analysis",
+    "Surgical Video Analysis",
+    "Physical Examination Video",
+    "Speech Therapy Assessment",
+    "Other Audio/Video"
+  ],
+  BATCH_TYPES: ["Mixed (Auto-detect)", "CT Scan", "MRI", "X-Ray", "Blood Work", "Pathology Report", "Audio/Video Analysis"]
 };
