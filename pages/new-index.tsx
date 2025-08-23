@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/router';
 import NewLayout from '@/components/layout/NewLayout';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -17,9 +18,64 @@ import {
   LanguageIcon
 } from '@/components/ui/Icons';
 
-export default function NewHome() {
+// Import existing components
+import ImageAnalysisTab from '@/components/ImageAnalysisTab';
+import ReportAnalysisTab from '@/components/ReportAnalysisTab';
+import AudioVideoAnalysisTab from '@/components/AudioVideoAnalysisTab';
+import BatchProcessingTab from '@/components/BatchProcessingTab';
+import NetworkDiagnosticsTab from '@/components/NetworkDiagnosticsTab';
+
+export default function Home() {
+  // State from original app
+  const [activeTab, setActiveTab] = useState<string>('imageAnalysis');
   const [userRole, setUserRole] = useState<string>('Patient');
-  const [apiKey, setApiKey] = useState<string>('');
+  const [apiKey, setApiKey] = useState<string>(process.env.NEXT_PUBLIC_GEMINI_API_KEY || '');
+  const [debugMode, setDebugMode] = useState<boolean>(false);
+  const router = useRouter();
+  
+  // Handle tab changes from URL parameter
+  useEffect(() => {
+    if (router.isReady) {
+      const { tab } = router.query;
+      if (tab) {
+        switch (tab) {
+          case 'image':
+            setActiveTab('imageAnalysis');
+            break;
+          case 'report':
+            setActiveTab('reportAnalysis');
+            break;
+          case 'audio-video':
+            setActiveTab('audioVideoAnalysis');
+            break;
+          case 'batch':
+            setActiveTab('batchProcessing');
+            break;
+          case 'diagnostics':
+            setActiveTab('networkDiagnostics');
+            break;
+        }
+      }
+    }
+  }, [router.isReady, router.query]);
+
+  // Function to render active component
+  const renderActiveComponent = () => {
+    switch (activeTab) {
+      case 'imageAnalysis':
+        return <ImageAnalysisTab apiKey={apiKey} userRole={userRole} />;
+      case 'reportAnalysis':
+        return <ReportAnalysisTab apiKey={apiKey} userRole={userRole} />;
+      case 'audioVideoAnalysis':
+        return <AudioVideoAnalysisTab apiKey={apiKey} userRole={userRole} />;
+      case 'batchProcessing':
+        return <BatchProcessingTab apiKey={apiKey} userRole={userRole} />;
+      case 'networkDiagnostics':
+        return <NetworkDiagnosticsTab apiKey={apiKey} />;
+      default:
+        return <ImageAnalysisTab apiKey={apiKey} userRole={userRole} />;
+    }
+  };
 
   return (
     <NewLayout pageTitle="MedPassport - AI-Powered Medical Analysis">
@@ -135,8 +191,108 @@ export default function NewHome() {
                 Apply
               </button>
             </div>
-            <p className="text-sm text-text-light">Don't have an API key? <a href="#" className="text-primary-500 hover:underline">Get one here</a>.</p>
+            <p className="text-sm text-text-light">Don't have an API key? <a href="https://ai.google.dev/tutorials/setup" target="_blank" rel="noopener noreferrer" className="text-primary-500 hover:underline">Get one here</a>.</p>
           </div>
+        </div>
+      </div>
+      
+      {/* Existing Functionality Container */}
+      <div className="mt-8 px-4 py-6 bg-white border border-neutral-200 rounded-xl shadow-sm">
+        <div className="flex items-center gap-2 mb-6">
+          <div className="w-2 h-6 bg-primary-600 rounded-full"></div>
+          <h2 className="text-xl font-semibold text-text-dark">Active Component</h2>
+        </div>
+        
+        {/* Tabs Navigation */}
+        <div className="flex flex-wrap gap-2 mb-6">
+          <button 
+            onClick={() => {
+              setActiveTab('imageAnalysis');
+              router.push('/?tab=image', undefined, { shallow: true });
+            }}
+            className={`px-4 py-2 rounded-lg font-medium text-sm transition-colors ${
+              activeTab === 'imageAnalysis' 
+                ? 'bg-primary-500 text-white' 
+                : 'bg-neutral-100 text-text-dark hover:bg-neutral-200'
+            }`}
+          >
+            <div className="flex items-center gap-2">
+              <ImageIcon />
+              <span>Image Analysis</span>
+            </div>
+          </button>
+          
+          <button 
+            onClick={() => {
+              setActiveTab('reportAnalysis');
+              router.push('/?tab=report', undefined, { shallow: true });
+            }}
+            className={`px-4 py-2 rounded-lg font-medium text-sm transition-colors ${
+              activeTab === 'reportAnalysis' 
+                ? 'bg-primary-500 text-white' 
+                : 'bg-neutral-100 text-text-dark hover:bg-neutral-200'
+            }`}
+          >
+            <div className="flex items-center gap-2">
+              <ReportIcon />
+              <span>Report Analysis</span>
+            </div>
+          </button>
+          
+          <button 
+            onClick={() => {
+              setActiveTab('audioVideoAnalysis');
+              router.push('/?tab=audio-video', undefined, { shallow: true });
+            }}
+            className={`px-4 py-2 rounded-lg font-medium text-sm transition-colors ${
+              activeTab === 'audioVideoAnalysis' 
+                ? 'bg-primary-500 text-white' 
+                : 'bg-neutral-100 text-text-dark hover:bg-neutral-200'
+            }`}
+          >
+            <div className="flex items-center gap-2">
+              <AudioVideoIcon />
+              <span>Audio/Video Analysis</span>
+            </div>
+          </button>
+          
+          <button 
+            onClick={() => {
+              setActiveTab('batchProcessing');
+              router.push('/?tab=batch', undefined, { shallow: true });
+            }}
+            className={`px-4 py-2 rounded-lg font-medium text-sm transition-colors ${
+              activeTab === 'batchProcessing' 
+                ? 'bg-primary-500 text-white' 
+                : 'bg-neutral-100 text-text-dark hover:bg-neutral-200'
+            }`}
+          >
+            <div className="flex items-center gap-2">
+              <BatchIcon />
+              <span>Batch Processing</span>
+            </div>
+          </button>
+          
+          <button 
+            onClick={() => {
+              setActiveTab('networkDiagnostics');
+              router.push('/?tab=diagnostics', undefined, { shallow: true });
+            }}
+            className={`px-4 py-2 rounded-lg font-medium text-sm transition-colors ${
+              activeTab === 'networkDiagnostics' 
+                ? 'bg-primary-500 text-white' 
+                : 'bg-neutral-100 text-text-dark hover:bg-neutral-200'
+            }`}
+          >
+            <div className="flex items-center gap-2">
+              <span>Diagnostics</span>
+            </div>
+          </button>
+        </div>
+        
+        {/* Component Container */}
+        <div className="mt-6 p-4 border border-neutral-200 rounded-lg bg-neutral-50">
+          {renderActiveComponent()}
         </div>
       </div>
 
@@ -252,86 +408,88 @@ export default function NewHome() {
         </div>
       </div>
 
-      {/* Results Section */}
-      <div className="mt-16 px-4 pb-16">
-        <h2 className="text-2xl font-bold text-text-dark mb-6">Analysis Results</h2>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {/* Patient Report */}
-          <div className="bg-white border border-neutral-200 rounded-xl overflow-hidden shadow-sm">
-            <div className="px-6 py-4 bg-primary-50 border-b border-neutral-200">
-              <div className="flex justify-between items-center">
-                <h3 className="font-semibold text-text-dark flex items-center gap-2">
-                  <PatientIcon />
-                  Patient Report
-                </h3>
-                <span className="text-sm text-success-600 font-medium bg-success-50 px-2 py-1 rounded">Simplified</span>
+      {/* Results Section - This is now hidden when using integrated components */}
+      {!activeTab && (
+        <div className="mt-16 px-4 pb-16">
+          <h2 className="text-2xl font-bold text-text-dark mb-6">Analysis Results</h2>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {/* Patient Report */}
+            <div className="bg-white border border-neutral-200 rounded-xl overflow-hidden shadow-sm">
+              <div className="px-6 py-4 bg-primary-50 border-b border-neutral-200">
+                <div className="flex justify-between items-center">
+                  <h3 className="font-semibold text-text-dark flex items-center gap-2">
+                    <PatientIcon />
+                    Patient Report
+                  </h3>
+                  <span className="text-sm text-success-600 font-medium bg-success-50 px-2 py-1 rounded">Simplified</span>
+                </div>
+              </div>
+              
+              <div className="p-6">
+                <div className="min-h-[200px] bg-neutral-50 rounded-lg flex items-center justify-center">
+                  <span className="text-text-muted">Patient-friendly report will appear here</span>
+                </div>
+                
+                <div className="mt-4 flex justify-between">
+                  <div>
+                    <h4 className="font-medium text-text-dark">Key Findings</h4>
+                    <p className="text-sm text-text-muted mt-1">Simplified for patient understanding</p>
+                  </div>
+                  <button className="px-4 py-2 bg-primary-500 hover:bg-primary-600 text-white rounded-lg text-sm font-medium transition-colors">
+                    View Full Report
+                  </button>
+                </div>
               </div>
             </div>
             
-            <div className="p-6">
-              <div className="min-h-[200px] bg-neutral-50 rounded-lg flex items-center justify-center">
-                <span className="text-text-muted">Patient-friendly report will appear here</span>
+            {/* Doctor Report */}
+            <div className="bg-white border border-neutral-200 rounded-xl overflow-hidden shadow-sm">
+              <div className="px-6 py-4 bg-primary-50 border-b border-neutral-200">
+                <div className="flex justify-between items-center">
+                  <h3 className="font-semibold text-text-dark flex items-center gap-2">
+                    <DoctorIcon />
+                    Doctor Report
+                  </h3>
+                  <span className="text-sm text-primary-600 font-medium bg-primary-50 px-2 py-1 rounded border border-primary-100">Detailed</span>
+                </div>
               </div>
               
-              <div className="mt-4 flex justify-between">
-                <div>
-                  <h4 className="font-medium text-text-dark">Key Findings</h4>
-                  <p className="text-sm text-text-muted mt-1">Simplified for patient understanding</p>
+              <div className="p-6">
+                <div className="min-h-[200px] bg-neutral-50 rounded-lg flex items-center justify-center">
+                  <span className="text-text-muted">Detailed medical report will appear here</span>
                 </div>
-                <button className="px-4 py-2 bg-primary-500 hover:bg-primary-600 text-white rounded-lg text-sm font-medium transition-colors">
-                  View Full Report
-                </button>
+                
+                <div className="mt-4 flex justify-between">
+                  <div>
+                    <h4 className="font-medium text-text-dark">Clinical Analysis</h4>
+                    <p className="text-sm text-text-muted mt-1">Detailed medical terminology included</p>
+                  </div>
+                  <button className="px-4 py-2 bg-primary-500 hover:bg-primary-600 text-white rounded-lg text-sm font-medium transition-colors">
+                    View Full Report
+                  </button>
+                </div>
               </div>
             </div>
           </div>
           
-          {/* Doctor Report */}
-          <div className="bg-white border border-neutral-200 rounded-xl overflow-hidden shadow-sm">
-            <div className="px-6 py-4 bg-primary-50 border-b border-neutral-200">
-              <div className="flex justify-between items-center">
-                <h3 className="font-semibold text-text-dark flex items-center gap-2">
-                  <DoctorIcon />
-                  Doctor Report
-                </h3>
-                <span className="text-sm text-primary-600 font-medium bg-primary-50 px-2 py-1 rounded border border-primary-100">Detailed</span>
-              </div>
-            </div>
-            
-            <div className="p-6">
-              <div className="min-h-[200px] bg-neutral-50 rounded-lg flex items-center justify-center">
-                <span className="text-text-muted">Detailed medical report will appear here</span>
-              </div>
-              
-              <div className="mt-4 flex justify-between">
-                <div>
-                  <h4 className="font-medium text-text-dark">Clinical Analysis</h4>
-                  <p className="text-sm text-text-muted mt-1">Detailed medical terminology included</p>
-                </div>
-                <button className="px-4 py-2 bg-primary-500 hover:bg-primary-600 text-white rounded-lg text-sm font-medium transition-colors">
-                  View Full Report
-                </button>
-              </div>
-            </div>
+          {/* Action Buttons */}
+          <div className="mt-8 flex justify-center gap-4">
+            <button className="flex items-center gap-2 px-5 py-3 border border-neutral-200 hover:bg-neutral-50 rounded-lg text-text-dark font-medium transition-colors">
+              <ExportIcon />
+              Export
+            </button>
+            <button className="flex items-center gap-2 px-5 py-3 border border-neutral-200 hover:bg-neutral-50 rounded-lg text-text-dark font-medium transition-colors">
+              <DownloadIcon />
+              Download
+            </button>
+            <button className="flex items-center gap-2 px-5 py-3 border border-neutral-200 hover:bg-neutral-50 rounded-lg text-text-dark font-medium transition-colors">
+              <ShareIcon />
+              Share
+            </button>
           </div>
         </div>
-        
-        {/* Action Buttons */}
-        <div className="mt-8 flex justify-center gap-4">
-          <button className="flex items-center gap-2 px-5 py-3 border border-neutral-200 hover:bg-neutral-50 rounded-lg text-text-dark font-medium transition-colors">
-            <ExportIcon />
-            Export
-          </button>
-          <button className="flex items-center gap-2 px-5 py-3 border border-neutral-200 hover:bg-neutral-50 rounded-lg text-text-dark font-medium transition-colors">
-            <DownloadIcon />
-            Download
-          </button>
-          <button className="flex items-center gap-2 px-5 py-3 border border-neutral-200 hover:bg-neutral-50 rounded-lg text-text-dark font-medium transition-colors">
-            <ShareIcon />
-            Share
-          </button>
-        </div>
-      </div>
+      )}
     </NewLayout>
   );
 }

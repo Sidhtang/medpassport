@@ -10,7 +10,7 @@ interface NewLayoutProps {
 
 const NewLayout = ({ children, pageTitle = "MedPassport - AI-Powered Medical Analysis" }: NewLayoutProps) => {
   return (
-    <div className="min-h-screen bg-neutral-50">
+    <div className="min-h-screen bg-primary-50 text-center">
       <Head>
         <title>{pageTitle}</title>
         <meta name="description" content="AI-powered medical image, text, and audio/video analysis for patients and healthcare professionals" />
@@ -18,59 +18,61 @@ const NewLayout = ({ children, pageTitle = "MedPassport - AI-Powered Medical Ana
       </Head>
 
       {/* Header */}
-      <header className="h-[72px] border-b border-neutral-200 bg-white px-4 md:px-10 py-3 flex justify-between items-center sticky top-0 z-50 shadow-sm">
-        <div className="flex items-center gap-3">
-          <LogoIcon />
-          <div className="text-primary-600 text-xl font-bold">MedPassport</div>
-        </div>
-        <div className="flex flex-1 justify-end items-center gap-6 md:gap-8">
-          <div className="h-10 hidden md:flex items-center gap-7">
-            <Link href="/" className="text-text-dark text-sm font-medium hover:text-primary-600 transition-colors">Home</Link>
-            <Link href="/features" className="text-text-muted text-sm font-medium hover:text-primary-600 transition-colors">Features</Link>
-            <Link href="/pricing" className="text-text-muted text-sm font-medium hover:text-primary-600 transition-colors">Pricing</Link>
-            <Link href="/support" className="text-text-muted text-sm font-medium hover:text-primary-600 transition-colors">Support</Link>
+      <header className="h-[72px] border-b border-neutral-200 bg-white px-4 md:px-10 py-3 sticky top-0 z-50 shadow-sm">
+        <div className="flex flex-col md:flex-row items-center justify-between max-w-[1200px] mx-auto">
+          <div className="flex items-center gap-3 mb-2 md:mb-0">
+            <LogoIcon />
+            <div className="text-primary-600 text-xl font-bold">MedPassport</div>
           </div>
-          <div className="flex gap-3">
-            <button className="h-10 px-5 bg-primary-500 hover:bg-primary-600 active:bg-primary-700 text-white rounded-lg font-semibold text-sm transition-colors shadow-sm hover:shadow">
-              Get Started
-            </button>
-            <button className="h-10 px-5 bg-white border border-neutral-200 hover:bg-neutral-100 text-text-dark rounded-lg font-semibold text-sm transition-colors shadow-sm">
-              Log In
-            </button>
+          <div className="flex flex-col md:flex-row justify-center items-center gap-4 md:gap-8 w-full md:w-auto">
+            <div className="h-10 flex items-center gap-5 md:gap-7 mb-2 md:mb-0">
+              <Link href="/" className="text-text-dark text-sm font-medium hover:text-primary-600 transition-colors">Home</Link>
+              <Link href="/features" className="text-text-muted text-sm font-medium hover:text-primary-600 transition-colors">Features</Link>
+              <Link href="/pricing" className="text-text-muted text-sm font-medium hover:text-primary-600 transition-colors">Pricing</Link>
+              <Link href="/support" className="text-text-muted text-sm font-medium hover:text-primary-600 transition-colors">Support</Link>
+            </div>
+            <div className="flex gap-3">
+              <button className="h-10 px-5 bg-primary-500 hover:bg-primary-600 active:bg-primary-700 text-white rounded-lg font-semibold text-sm transition-colors shadow-sm hover:shadow">
+                Get Started
+              </button>
+              <button className="h-10 px-5 bg-white border border-neutral-200 hover:bg-neutral-100 text-text-dark rounded-lg font-semibold text-sm transition-colors shadow-sm">
+                Log In
+              </button>
+            </div>
           </div>
         </div>
       </header>
 
       {/* Main Content */}
       <div className="w-full px-4 md:px-10 lg:px-20 py-8">
-        <div className="max-w-[1200px] mx-auto">
+        <div className="max-w-[1200px] mx-auto text-center">
           {children}
         </div>
       </div>
 
       {/* Footer */}
-      <footer className="w-full bg-white border-t border-neutral-200">
+      <footer className="w-full bg-primary-50 border-t border-neutral-200">
         <div className="max-w-[1200px] mx-auto px-4 md:px-10 py-10 flex flex-col gap-8">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-            <div className="flex flex-col gap-3">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+            <div className="flex flex-col items-center gap-3">
               <h3 className="font-semibold text-text-dark">MedPassport</h3>
               <Link href="/about" className="text-sm text-text-muted hover:text-primary-600">About Us</Link>
               <Link href="/team" className="text-sm text-text-muted hover:text-primary-600">Our Team</Link>
               <Link href="/careers" className="text-sm text-text-muted hover:text-primary-600">Careers</Link>
             </div>
-            <div className="flex flex-col gap-3">
+            <div className="flex flex-col items-center gap-3">
               <h3 className="font-semibold text-text-dark">Resources</h3>
               <Link href="/blog" className="text-sm text-text-muted hover:text-primary-600">Blog</Link>
               <Link href="/guides" className="text-sm text-text-muted hover:text-primary-600">Guides</Link>
               <Link href="/faq" className="text-sm text-text-muted hover:text-primary-600">FAQ</Link>
             </div>
-            <div className="flex flex-col gap-3">
+            <div className="flex flex-col items-center gap-3">
               <h3 className="font-semibold text-text-dark">Legal</h3>
               <Link href="/privacy" className="text-sm text-text-muted hover:text-primary-600">Privacy Policy</Link>
               <Link href="/terms" className="text-sm text-text-muted hover:text-primary-600">Terms of Service</Link>
               <Link href="/security" className="text-sm text-text-muted hover:text-primary-600">Security</Link>
             </div>
-            <div className="flex flex-col gap-3">
+            <div className="flex flex-col items-center gap-3">
               <h3 className="font-semibold text-text-dark">Contact</h3>
               <Link href="/contact" className="text-sm text-text-muted hover:text-primary-600">Contact Us</Link>
               <Link href="/support" className="text-sm text-text-muted hover:text-primary-600">Support</Link>
