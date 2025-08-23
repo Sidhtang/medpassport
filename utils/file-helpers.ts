@@ -51,6 +51,93 @@ export const processImage = async (fileBuffer: Buffer): Promise<string> => {
   }
 };
 
+export const processAudioVideo = async (fileBuffer: Buffer, type: 'audio' | 'video'): Promise<{ base64Data: string; extractedAudioFeatures?: string }> => {
+  try {
+    // For now, we'll convert the file to base64 for Gemini 2.0's multimodal capabilities
+    // In a production environment, you might want to use FFmpeg for more sophisticated processing
+    
+    const base64Data = fileBuffer.toString('base64');
+    
+    if (type === 'audio') {
+      // Extract basic audio features (this is a simplified version)
+      const audioFeatures = await extractAudioFeatures(fileBuffer);
+      return { base64Data, extractedAudioFeatures: audioFeatures };
+    } else {
+      // For video, return base64 data for Gemini 2.0 to process
+      return { base64Data };
+    }
+  } catch (error) {
+    console.error('Error processing audio/video:', error);
+    throw new Error('Failed to process audio/video file');
+  }
+};
+
+export const extractAudioFeatures = async (audioBuffer: Buffer): Promise<string> => {
+  try {
+    // This is a simplified audio analysis
+    // In a production environment, you would use libraries like node-wav, audio-analysis, etc.
+    
+    const fileSize = audioBuffer.length;
+    const duration = estimateAudioDuration(audioBuffer);
+    
+    // Basic file analysis
+    const features = {
+      fileSize: `${Math.round(fileSize / 1024)} KB`,
+      estimatedDuration: `${duration} seconds`,
+      sampleAnalysis: analyzeAudioSamples(audioBuffer),
+      fileFormat: detectAudioFormat(audioBuffer),
+    };
+    
+    return JSON.stringify(features, null, 2);
+  } catch (error) {
+    console.error('Error extracting audio features:', error);
+    return 'Audio feature extraction failed';
+  }
+};
+
+const estimateAudioDuration = (buffer: Buffer): number => {
+  // This is a very rough estimation based on file size
+  // Actual duration would require proper audio decoding
+  const assumedBitrate = 128000; // 128 kbps
+  const fileSizeBits = buffer.length * 8;
+  return Math.round(fileSizeBits / assumedBitrate);
+};
+
+const analyzeAudioSamples = (buffer: Buffer): string => {
+  // Basic analysis of audio data
+  const samples = [];
+  const sampleSize = Math.min(1000, buffer.length);
+  
+  for (let i = 0; i < sampleSize; i += 2) {
+    if (i + 1 < buffer.length) {
+      // Read 16-bit samples (little-endian)
+      const sample = buffer.readInt16LE(i);
+      samples.push(sample);
+    }
+  }
+  
+  if (samples.length === 0) return 'No samples analyzed';
+  
+  const maxAmplitude = Math.max(...samples.map(Math.abs));
+  const avgAmplitude = samples.reduce((sum, s) => sum + Math.abs(s), 0) / samples.length;
+  
+  return `Max amplitude: ${maxAmplitude}, Average amplitude: ${Math.round(avgAmplitude)}`;
+};
+
+const detectAudioFormat = (buffer: Buffer): string => {
+  // Detect audio format from file headers
+  if (buffer.length < 4) return 'Unknown';
+  
+  const header = buffer.toString('ascii', 0, 4);
+  
+  if (header === 'RIFF') return 'WAV';
+  if (header.startsWith('ID3') || (buffer[0] === 0xFF && (buffer[1] & 0xE0) === 0xE0)) return 'MP3';
+  if (header === 'OggS') return 'OGG';
+  if (header === 'fLaC') return 'FLAC';
+  
+  return 'Unknown';
+};
+
 export const saveUploadedFile = async (fileBuffer: Buffer, fileName: string): Promise<string> => {
   ensureUploadDir();
   const uniqueId = uuidv4();
@@ -114,11 +201,37 @@ export const getFileType = (fileName: string): string => {
     return 'pdf';
   } else if (['.txt', '.csv', '.docx', '.doc'].includes(ext)) {
     return 'text';
-  } else if (['.mp3', '.wav', '.ogg', '.m4a'].includes(ext)) {
+  } else if (['.mp3', '.wav', '.ogg', '.m4a', '.aac', '.flac', '.wma', '.webm'].includes(ext)) {
     return 'audio';
+  } else if (['.mp4', '.avi', '.mov', '.wmv', '.flv', '.webm', '.mkv', '.m4v'].includes(ext)) {
+    return 'video';
   } else {
     return 'unknown';
   }
+};
+
+export const validateAudioVideoFile = (file: File): { valid: boolean; error?: string } => {
+  const maxSize = 50 * 1024 * 1024; // 50MB
+  const supportedAudioFormats = ['.mp3', '.wav', '.ogg', '.m4a', '.aac', '.flac', '.wma', '.webm'];
+  const supportedVideoFormats = ['.mp4', '.avi', '.mov', '.wmv', '.flv', '.webm', '.mkv', '.m4v'];
+  
+  if (file.size > maxSize) {
+    return { valid: false, error: 'File size exceeds 50MB limit' };
+  }
+  
+  const fileType = getFileType(file.name);
+  if (fileType !== 'audio' && fileType !== 'video') {
+    return { valid: false, error: 'Please upload a valid audio or video file' };
+  }
+  
+  const ext = path.extname(file.name).toLowerCase();
+  const supportedFormats = [...supportedAudioFormats, ...supportedVideoFormats];
+  
+  if (!supportedFormats.includes(ext)) {
+    return { valid: false, error: `Unsupported file format: ${ext}` };
+  }
+  
+  return { valid: true };
 };
 
 export const cleanupTempFiles = async (): Promise<void> => {
