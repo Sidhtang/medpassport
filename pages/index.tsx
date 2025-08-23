@@ -9,6 +9,25 @@ import AudioVideoAnalysisTab from '@/components/AudioVideoAnalysisTab';
 import BatchProcessingTab from '@/components/BatchProcessingTab';
 import NetworkDiagnosticsTab from '@/components/NetworkDiagnosticsTab';
 
+// Figma Design Tab Component
+const FigmaDesignTab: React.FC = () => {
+  return (
+    <div className="space-y-4">
+      <h2 className="text-xl font-semibold mb-3">Figma Design Preview</h2>
+      <p className="mb-4">This is the Figma design for the MedPassport application. It shows the proposed UI elements and layout.</p>
+      
+      <div className="w-full aspect-video bg-white rounded-lg shadow-lg overflow-hidden border border-gray-200">
+        <iframe
+          className="w-full h-full"
+          src="https://embed.figma.com/design/cGO7WuT5vRcUASz52jVdLB/Untitled?node-id=0-1&embed-host=share"
+          allowFullScreen
+          style={{ border: 'none' }}
+        />
+      </div>
+    </div>
+  );
+};
+
 export default function Home() {
   const router = useRouter();
   const [userRole, setUserRole] = useState<string>('Doctor');
@@ -29,6 +48,8 @@ export default function Home() {
         return <BatchProcessingTab apiKey={apiKey} userRole={userRole} />;
       case 'diagnostics':
         return <NetworkDiagnosticsTab />;
+      case 'figma-design':
+        return <FigmaDesignTab />;
       default:
         return <Dashboard apiKey={apiKey} userRole={userRole} />;
     }
