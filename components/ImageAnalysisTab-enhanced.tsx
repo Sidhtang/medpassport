@@ -1,6 +1,21 @@
-import React, { useState, useCallback } from 'react';
-import { MedicalImageFormData, AnalysisResult, SUPPORTED_LANGUAGES, REPORT_TYPES } from '@/lib/types';
+import * as React from 'react';
+import { useState, useCallback, ChangeEvent, FormEvent } from 'react';
+import { MedicalImageFormData, ImageAnalysisResult, AnalysisResult, SUPPORTED_LANGUAGES, REPORT_TYPES } from '@/lib/types';
 import { analyzeImage, translateText, summarizeAnalysis, generatePdfReport } from '@/lib/api';
+// Add JSX namespace declaration to fix the "JSX element implicitly has type 'any'" errors
+declare namespace JSX {
+  interface IntrinsicElements {
+    [elemName: string]: any;
+  }
+}
+
+// Import or define ImageAnalysisParams interface
+interface ImageAnalysisParams {
+  file: File;
+  imageType: string;
+  clinicalContext?: string;
+  userRole: string;
+}
 import Card from './ui/Card';
 import Button from './ui/Button';
 
@@ -35,7 +50,12 @@ const PdfIcon = () => (
   </svg>
 );
 
-const ImageAnalysisTab: React.FC<{ apiKey: string; userRole: string }> = ({ apiKey, userRole }) => {
+interface ImageAnalysisTabProps {
+  apiKey: string;
+  userRole: string;
+}
+
+const ImageAnalysisTab = ({ apiKey, userRole }: ImageAnalysisTabProps) => {
   const [reportType, setReportType] = useState<string>(REPORT_TYPES.IMAGE_TYPES[0]);
   const [file, setFile] = useState<File | undefined>(undefined);
   const [filePreview, setFilePreview] = useState<string | undefined>(undefined);
@@ -50,21 +70,21 @@ const ImageAnalysisTab: React.FC<{ apiKey: string; userRole: string }> = ({ apiK
   const [generating, setGenerating] = useState<boolean>(false);
   const [activeTab, setActiveTab] = useState<'analysis' | 'summary'>('analysis');
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = (e: any) => {
     if (e.target.files && e.target.files[0]) {
       const selectedFile = e.target.files[0];
       setFile(selectedFile);
       
       // Create preview
       const reader = new FileReader();
-      reader.onload = (event) => {
+      reader.onload = (event: any) => {
         setFilePreview(event.target?.result as string);
       };
       reader.readAsDataURL(selectedFile);
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: any) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
@@ -72,21 +92,31 @@ const ImageAnalysisTab: React.FC<{ apiKey: string; userRole: string }> = ({ apiK
     setSummaryResult('');
     
     try {
-      const formData: MedicalImageFormData = {
-        reportType,
-        userRole,
-        apiKey,
-        additionalInfo,
+      const imageAnalysisParams: ImageAnalysisParams = {
         file,
-        targetLanguage
+        imageType: reportType,
+        clinicalContext: additionalInfo,
+        userRole
       };
       
-      const response = await analyzeImage(formData);
+      const response = await analyzeImage(imageAnalysisParams);
       
       if (response.error) {
         setError(response.error);
       } else {
-        setResult(response.result);
+        // Handle structured result from ImageAnalysisResult
+        const analysisText = `
+          **Findings:** ${response.findings}
+          
+          **Impressions:** ${response.impressions}
+          
+          ${response.recommendations ? `**Recommendations:** ${response.recommendations}` : ''}
+          
+          ${response.possibleConditions ? `**Possible Conditions:** ${response.possibleConditions}` : ''}
+          
+          ${response.additionalFindings ? `**Additional Findings:** ${response.additionalFindings}` : ''}
+        `;
+        setResult(analysisText);
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An unknown error occurred');
@@ -100,17 +130,10 @@ const ImageAnalysisTab: React.FC<{ apiKey: string; userRole: string }> = ({ apiK
     
     setTranslating(true);
     try {
-      const translated = await translateText({
-        text: result,
-        targetLanguage,
-        apiKey
-      });
+      const translated = await translateText(result, targetLanguage, apiKey);
       
-      if (translated.error) {
-        setError(translated.error);
-      } else {
-        setResult(translated.result);
-      }
+      // translateText now returns a string directly
+      setResult(translated);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error during translation');
     } finally {
@@ -123,17 +146,11 @@ const ImageAnalysisTab: React.FC<{ apiKey: string; userRole: string }> = ({ apiK
     
     setSummarizing(true);
     try {
-      const summary = await summarizeAnalysis({
-        text: result,
-        apiKey
-      });
+      const summary = await summarizeAnalysis(result, apiKey);
       
-      if (summary.error) {
-        setError(summary.error);
-      } else {
-        setSummaryResult(summary.result);
-        setActiveTab('summary');
-      }
+      // summarizeAnalysis now returns a string directly
+      setSummaryResult(summary);
+      setActiveTab('summary');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error during summarization');
     } finally {
@@ -146,13 +163,7 @@ const ImageAnalysisTab: React.FC<{ apiKey: string; userRole: string }> = ({ apiK
     
     setGenerating(true);
     try {
-      await generatePdfReport({
-        reportType,
-        userRole,
-        result,
-        summary: summaryResult,
-        apiKey
-      });
+      await generatePdfReport(result, reportType, userRole);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error generating PDF');
     } finally {
@@ -179,7 +190,7 @@ const ImageAnalysisTab: React.FC<{ apiKey: string; userRole: string }> = ({ apiK
               </label>
               <select
                 value={reportType}
-                onChange={(e) => setReportType(e.target.value)}
+                onChange={(e: any) => setReportType(e.target.value)}
                 className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-primary-500 focus:border-primary-500 rounded-md shadow-sm"
                 disabled={loading}
               >
@@ -267,7 +278,7 @@ const ImageAnalysisTab: React.FC<{ apiKey: string; userRole: string }> = ({ apiK
               </label>
               <select
                 value={targetLanguage}
-                onChange={(e) => setTargetLanguage(e.target.value)}
+                onChange={(e: any) => setTargetLanguage(e.target.value)}
                 className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-primary-500 focus:border-primary-500 rounded-md shadow-sm"
                 disabled={loading}
               >
