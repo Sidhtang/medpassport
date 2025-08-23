@@ -23,10 +23,6 @@ interface ImageAnalysisTabProps {
 }
 
 const ImageAnalysisTab = ({ apiKey, userRole }: ImageAnalysisTabProps) => {
-import { MedicalImageFormData, AnalysisResult, SUPPORTED_LANGUAGES, REPORT_TYPES } from '@/lib/types';
-import { analyzeImage, translateText, summarizeAnalysis, generatePdfReport } from '@/lib/api';
-
-const ImageAnalysisTab: React.FC<{ apiKey: string; userRole: string }> = ({ apiKey, userRole }) => {
   const [reportType, setReportType] = useState<string>(REPORT_TYPES.IMAGE_TYPES[0]);
   const [file, setFile] = useState<File | undefined>(undefined);
   const [filePreview, setFilePreview] = useState<string | undefined>(undefined);
@@ -37,6 +33,7 @@ const ImageAnalysisTab: React.FC<{ apiKey: string; userRole: string }> = ({ apiK
   const [error, setError] = useState<string | null>(null);
   const [summaryResult, setSummaryResult] = useState<string>('');
   const [summarizing, setSummarizing] = useState<boolean>(false);
+  const [generating, setGenerating] = useState<boolean>(false);
 
   const handleFileChange = (e: any) => {
     if (e.target.files && e.target.files[0]) {
@@ -107,30 +104,29 @@ const ImageAnalysisTab: React.FC<{ apiKey: string; userRole: string }> = ({ apiK
   };
 
   const handleSummarize = async () => {
+    if (!result) return;
+    
     setSummarizing(true);
     try {
       const summary = await summarizeAnalysis(result, apiKey);
       setSummaryResult(summary);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred during summarization');
+      setError(err instanceof Error ? err.message : 'Error during summarization');
     } finally {
       setSummarizing(false);
     }
   };
 
-  const handleDownloadPDF = async () => {
+  const handleGeneratePDF = async () => {
+    if (!result) return;
+    
+    setGenerating(true);
     try {
-      const pdfBlob = await generatePdfReport(result, reportType, userRole);
-      const url = window.URL.createObjectURL(pdfBlob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.setAttribute('download', `medical_report_${Date.now()}.pdf`);
-      document.body.appendChild(link);
-      link.click();
-      window.URL.revokeObjectURL(url);
-      link.remove();
+      await generatePdfReport(result, reportType, userRole);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to generate PDF');
+      setError(err instanceof Error ? err.message : 'Error generating PDF');
+    } finally {
+      setGenerating(false);
     }
   };
 
@@ -156,11 +152,12 @@ const ImageAnalysisTab: React.FC<{ apiKey: string; userRole: string }> = ({ apiK
         <div>
           <label className="block text-sm font-medium mb-1">Upload Medical Image</label>
           <input 
-            type="file" 
-            accept="image/*"
+            type="file"
             onChange={handleFileChange}
-            className="w-full p-2 border rounded"
+            accept="image/*"
+            className="w-full p-2"
           />
+          
           {filePreview && (
             <div className="mt-2">
               <img src={filePreview} alt="Preview" className="max-h-40 rounded" />
@@ -169,19 +166,20 @@ const ImageAnalysisTab: React.FC<{ apiKey: string; userRole: string }> = ({ apiK
         </div>
         
         <div>
-          <label className="block text-sm font-medium mb-1">Additional Information (symptoms, medical history, etc.)</label>
-          <textarea 
+          <label className="block text-sm font-medium mb-1">Additional Information (Optional)</label>
+          <textarea
             value={additionalInfo}
             onChange={(e) => setAdditionalInfo(e.target.value)}
             className="w-full p-2 border rounded"
-            rows={2}
+            placeholder="Add any clinical context or relevant patient information"
+            rows={3}
           />
         </div>
         
         <div>
-          <label className="block text-sm font-medium mb-1">Translate to</label>
-          <select 
-            value={targetLanguage} 
+          <label className="block text-sm font-medium mb-1">Target Language</label>
+          <select
+            value={targetLanguage}
             onChange={(e: any) => setTargetLanguage(e.target.value)}
             className="w-full p-2 border rounded"
           >
@@ -191,32 +189,26 @@ const ImageAnalysisTab: React.FC<{ apiKey: string; userRole: string }> = ({ apiK
           </select>
         </div>
         
-        <button 
-          type="submit" 
-          disabled={loading || !file}
-          className={`w-full p-2 rounded font-medium ${loading || !file ? 'bg-gray-400' : 'bg-blue-600 text-white hover:bg-blue-700'}`}
-        >
-          {loading ? 'Analyzing...' : 'Analyze Image'}
-        </button>
+        <div>
+          <button
+            type="submit"
+            disabled={loading}
+            className={`px-4 py-2 rounded ${loading ? 'bg-gray-400' : 'bg-green-600 text-white hover:bg-green-700'}`}
+          >
+            {loading ? 'Analyzing...' : 'Analyze Image'}
+          </button>
+        </div>
       </form>
       
       {error && (
-        <div className="mt-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
+        <div className="mt-4 p-3 bg-red-100 text-red-700 rounded">
           {error}
         </div>
       )}
       
       {result && (
         <div className="mt-6">
-          <div className="flex justify-between items-center mb-2">
-            <h3 className="text-lg font-medium">Analysis Results</h3>
-            <button
-              onClick={handleDownloadPDF}
-              className="px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700 text-sm"
-            >
-              Download PDF
-            </button>
-          </div>
+          <h3 className="text-lg font-medium mb-2">Analysis Results</h3>
           <div className="p-4 bg-gray-50 border rounded whitespace-pre-wrap">
             {result}
           </div>
