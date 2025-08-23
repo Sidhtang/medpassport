@@ -11,6 +11,7 @@ import {
 } from '@/utils/ai-helpers';
 import { processAudioVideo, extractAudioFeatures, getFileType } from '@/utils/file-helpers';
 import path from 'path';
+import prisma from '@/lib/db/prisma';
 
 export const config = {
   api: {
@@ -117,6 +118,22 @@ Please analyze these audio characteristics and provide insights based on the med
     
     // Save to cache
     saveToCache(contentHash, reportType, userRole, filteredResponse);
+    
+    // Save result to database
+    try {
+      await prisma.analysisResult.create({
+        data: {
+          reportType,
+          result: filteredResponse,
+          userRole,
+          additionalInfo: additionalInfo || null,
+          targetLanguage: fields.targetLanguage ? String(fields.targetLanguage) : null
+        }
+      });
+    } catch (dbError) {
+      console.error('Error saving to database:', dbError);
+      // Continue even if database save fails
+    }
     
     // Clean up temporary file
     await fs.unlink(mediaFile.filepath);
