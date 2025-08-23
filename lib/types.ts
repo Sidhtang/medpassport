@@ -4,6 +4,15 @@ export interface AnalysisResult {
   error?: string;
 }
 
+export interface ImageAnalysisResult {
+  findings: string;
+  impressions: string;
+  recommendations?: string;
+  possibleConditions?: string;
+  additionalFindings?: string;
+  error?: string;
+}
+
 export interface FileInfo {
   name: string;
   type: string;

@@ -1,4 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/router';
+import MainLayout from '@/components/layout/MainLayout';
+import Dashboard from '@/components/Dashboard';
+import ImageAnalysisTabEnhanced from '@/components/ImageAnalysisTabEnhanced';
 import ImageAnalysisTab from '@/components/ImageAnalysisTab';
 import ReportAnalysisTab from '@/components/ReportAnalysisTab';
 import AudioVideoAnalysisTab from '@/components/AudioVideoAnalysisTab';
@@ -6,180 +10,50 @@ import BatchProcessingTab from '@/components/BatchProcessingTab';
 import NetworkDiagnosticsTab from '@/components/NetworkDiagnosticsTab';
 
 export default function Home() {
-  const [activeTab, setActiveTab] = useState<string>('imageAnalysis');
-  const [userRole, setUserRole] = useState<string>('Patient');
+  const router = useRouter();
+  const [userRole, setUserRole] = useState<string>('Doctor');
   const [apiKey, setApiKey] = useState<string>(process.env.NEXT_PUBLIC_GEMINI_API_KEY || '');
   const [debugMode, setDebugMode] = useState<boolean>(false);
+  
+  const { tab } = router.query;
 
-  const renderActiveTab = () => {
-    switch (activeTab) {
-      case 'imageAnalysis':
-        return <ImageAnalysisTab apiKey={apiKey} userRole={userRole} />;
-      case 'reportAnalysis':
+  const renderContent = () => {
+    switch (tab) {
+      case 'image':
+        return <ImageAnalysisTabEnhanced apiKey={apiKey} userRole={userRole} />;
+      case 'report':
         return <ReportAnalysisTab apiKey={apiKey} userRole={userRole} />;
-      case 'audioVideoAnalysis':
+      case 'audio-video':
         return <AudioVideoAnalysisTab apiKey={apiKey} userRole={userRole} />;
-      case 'batchProcessing':
+      case 'batch':
         return <BatchProcessingTab apiKey={apiKey} userRole={userRole} />;
-      case 'networkDiagnostics':
+      case 'diagnostics':
         return <NetworkDiagnosticsTab />;
-      case 'help':
-        return <HelpInformationTab />;
       default:
-        return <ImageAnalysisTab apiKey={apiKey} userRole={userRole} />;
+        return <Dashboard apiKey={apiKey} userRole={userRole} />;
     }
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <header className="bg-blue-900 text-white py-4 shadow-md">
-        <div className="container mx-auto px-4">
-          <h1 className="text-2xl font-bold">🏥 Medical Report Analysis Tool</h1>
-          <p className="text-sm">Powered by Gemini 2.0 - Enhanced Version with Audio/Video Analysis</p>
+    <MainLayout 
+      pageTitle="MedPassport - AI Medical Analysis"
+      apiKey={apiKey} 
+      userRole={userRole}
+      setApiKey={setApiKey}
+      setUserRole={setUserRole}
+    >
+      {debugMode && (
+        <div className="mb-6 p-3 bg-gray-100 rounded text-xs font-mono">
+          <div>Debug Mode Enabled</div>
+          <div>API Key: {apiKey ? `${apiKey.slice(0, 4)}...${apiKey.slice(-4)}` : 'Not set'}</div>
+          <div>User Role: {userRole}</div>
+          <div>Current Tab: {tab as string || 'dashboard'}</div>
+          <div>Environment: {process.env.NODE_ENV}</div>
         </div>
-      </header>
-
-      <main className="container mx-auto p-4">
-        <div className="bg-white rounded-lg shadow-md mb-6">
-          <div className="p-4 border-b">
-            <div className="flex flex-wrap items-center gap-4">
-              <div>
-                <label className="block text-sm font-medium mb-1">I am a:</label>
-                <div className="flex space-x-4">
-                  <label className="inline-flex items-center">
-                    <input
-                      type="radio"
-                      value="Patient"
-                      checked={userRole === 'Patient'}
-                      onChange={() => setUserRole('Patient')}
-                      className="mr-2"
-                    />
-                    Patient
-                  </label>
-                  <label className="inline-flex items-center">
-                    <input
-                      type="radio"
-                      value="Doctor"
-                      checked={userRole === 'Doctor'}
-                      onChange={() => setUserRole('Doctor')}
-                      className="mr-2"
-                    />
-                    Doctor
-                  </label>
-                </div>
-              </div>
-
-              <div className="flex-grow">
-                <label className="block text-sm font-medium mb-1">Google AI API Key</label>
-                <input
-                  type="password"
-                  value={apiKey}
-                  onChange={(e) => setApiKey(e.target.value)}
-                  placeholder="Enter your API key"
-                  className="w-full p-2 border rounded"
-                />
-              </div>
-
-              <div>
-                <label className="inline-flex items-center">
-                  <input
-                    type="checkbox"
-                    checked={debugMode}
-                    onChange={() => setDebugMode(!debugMode)}
-                    className="mr-2"
-                  />
-                  Debug Mode
-                </label>
-              </div>
-            </div>
-            
-            {debugMode && (
-              <div className="mt-4 p-3 bg-gray-100 rounded text-xs font-mono">
-                <div>Debug Mode Enabled</div>
-                <div>API Key: {apiKey ? `${apiKey.slice(0, 4)}...${apiKey.slice(-4)}` : 'Not set'}</div>
-                <div>User Role: {userRole}</div>
-                <div>Current Tab: {activeTab}</div>
-                <div>Environment: {process.env.NODE_ENV}</div>
-              </div>
-            )}
-          </div>
-          
-          <nav className="flex border-b overflow-x-auto">
-            <button
-              className={`px-4 py-2 font-medium text-sm whitespace-nowrap ${
-                activeTab === 'imageAnalysis' 
-                  ? 'border-b-2 border-blue-600 text-blue-600' 
-                  : 'text-gray-600 hover:text-blue-600'
-              }`}
-              onClick={() => setActiveTab('imageAnalysis')}
-            >
-              Medical Images
-            </button>
-            <button
-              className={`px-4 py-2 font-medium text-sm whitespace-nowrap ${
-                activeTab === 'reportAnalysis' 
-                  ? 'border-b-2 border-blue-600 text-blue-600' 
-                  : 'text-gray-600 hover:text-blue-600'
-              }`}
-              onClick={() => setActiveTab('reportAnalysis')}
-            >
-              PDF & Lab Reports
-            </button>
-            <button
-              className={`px-4 py-2 font-medium text-sm whitespace-nowrap ${
-                activeTab === 'audioVideoAnalysis' 
-                  ? 'border-b-2 border-blue-600 text-blue-600' 
-                  : 'text-gray-600 hover:text-blue-600'
-              }`}
-              onClick={() => setActiveTab('audioVideoAnalysis')}
-            >
-              🎵 Audio & Video
-            </button>
-            <button
-              className={`px-4 py-2 font-medium text-sm whitespace-nowrap ${
-                activeTab === 'batchProcessing' 
-                  ? 'border-b-2 border-blue-600 text-blue-600' 
-                  : 'text-gray-600 hover:text-blue-600'
-              }`}
-              onClick={() => setActiveTab('batchProcessing')}
-            >
-              Batch Processing
-            </button>
-            <button
-              className={`px-4 py-2 font-medium text-sm whitespace-nowrap ${
-                activeTab === 'networkDiagnostics' 
-                  ? 'border-b-2 border-blue-600 text-blue-600' 
-                  : 'text-gray-600 hover:text-blue-600'
-              }`}
-              onClick={() => setActiveTab('networkDiagnostics')}
-            >
-              Network Diagnostics
-            </button>
-            <button
-              className={`px-4 py-2 font-medium text-sm whitespace-nowrap ${
-                activeTab === 'help' 
-                  ? 'border-b-2 border-blue-600 text-blue-600' 
-                  : 'text-gray-600 hover:text-blue-600'
-              }`}
-              onClick={() => setActiveTab('help')}
-            >
-              Help & Information
-            </button>
-          </nav>
-          
-          <div className="p-4">
-            {renderActiveTab()}
-          </div>
-        </div>
-      </main>
-
-      <footer className="bg-gray-100 py-4 border-t">
-        <div className="container mx-auto px-4 text-center text-sm text-gray-600">
-          <p>Medical Report Analysis Tool - Enhanced Version with Audio/Video Analysis</p>
-          <p className="text-xs mt-1">Disclaimer: This tool is provided for informational purposes only and does not replace professional medical advice.</p>
-        </div>
-      </footer>
-    </div>
+      )}
+      
+      {renderContent()}
+    </MainLayout>
   );
 }
 

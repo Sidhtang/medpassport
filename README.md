@@ -1,27 +1,40 @@
-# Medical Report Analysis Tool
+# MedPassport - Advanced Medical Analysis Platform
 
-A React-based web application for analyzing medical reports and images using Google's Gemini AI. This tool allows users to upload medical images (X-rays, CT scans, MRIs), text reports, or PDFs and receive AI-powered analysis in a user-friendly format.
+A modern, feature-rich React application for analyzing medical reports, images, and audio/video using Google's Gemini AI. MedPassport provides healthcare professionals and patients with comprehensive AI-powered insights from various medical content types in an intuitive, visually appealing interface.
 
 ## Features
 
-- Medical image analysis (X-rays, CT scans, MRIs, etc.)
-- PDF and lab report processing
-- Batch processing of multiple files
-- Translation to multiple languages
-- Result summarization
-- PDF report generation
-- Network diagnostics
-- Caching for faster responses
-- Responsive design for all devices
+- **Enhanced UI/UX** with vibrant colors, intuitive navigation, and responsive design
+- **Modern Dashboard** providing quick access to all platform capabilities
+- **Medical Image Analysis** (X-rays, CT scans, MRIs, etc.)
+- **Medical Report Processing** for PDFs and lab reports
+- **Audio/Video Analysis** for heart sounds, lung sounds, medical videos
+- **Batch Processing** of multiple files
+- **Multi-language Support** with translation capability
+- **Educational Resources** integrated throughout the application
+- **PDF Report Generation** with professional formatting
+- **Network Diagnostics** for troubleshooting connectivity issues
 
 ## Technology Stack
 
-- **Frontend**: React, Next.js, TailwindCSS
+- **Frontend**: React, Next.js, TailwindCSS with custom design system
 - **Backend**: Next.js API routes
+- **Database**: PostgreSQL with Prisma ORM
 - **AI**: Google Gemini AI (gemini-1.0-pro and gemini-1.0-pro-vision models)
 - **PDF Processing**: pdf-lib, pdfjs-dist
 - **Image Processing**: sharp
 - **Deployment**: Vercel
+
+## UI/UX Features
+
+- **Vibrant Color Palette**: Engaging color scheme optimized for medical applications
+- **Component Library**: Custom-designed cards, buttons, and UI elements
+- **Responsive Layout**: Adaptive design that works on desktop, tablet, and mobile
+- **Intuitive Navigation**: Clear information hierarchy with smart sidebar
+- **Educational Content**: Built-in resources to help users understand medical analyses
+- **Interactive Dashboard**: At-a-glance overview of platform capabilities
+- **Progress Visualization**: Clear visual feedback on analysis processes
+- **Accessibility Features**: Designed with accessibility in mind
 
 ## Prerequisites
 

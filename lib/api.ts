@@ -1,7 +1,37 @@
 import axios from 'axios';
-import { AnalysisResult, MedicalImageFormData, MedicalReportFormData, AudioVideoFormData, BatchProcessFormData } from '@/lib/types';
+import { AnalysisResult, ImageAnalysisResult, MedicalImageFormData, MedicalReportFormData, AudioVideoFormData, BatchProcessFormData } from '@/lib/types';
 
-export async function analyzeImage(data: MedicalImageFormData): Promise<AnalysisResult> {
+interface ImageAnalysisParams {
+  file: File;
+  imageType: string;
+  clinicalContext?: string;
+  userRole: string;
+}
+
+export async function analyzeImage(data: ImageAnalysisParams): Promise<ImageAnalysisResult> {
+  try {
+    const formData = new FormData();
+    formData.append('file', data.file);
+    formData.append('imageType', data.imageType);
+    formData.append('clinicalContext', data.clinicalContext || '');
+    formData.append('userRole', data.userRole);
+
+    const response = await axios.post('/api/analyze-image', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    
+    return response.data;
+  } catch (error) {
+    if (axios.isAxiosError(error) && error.response) {
+      throw new Error(error.response.data.error || 'Error analyzing image');
+    }
+    throw new Error('Error processing request');
+  }
+}
+
+export async function analyzeImageLegacy(data: MedicalImageFormData): Promise<AnalysisResult> {
   try {
     const formData = new FormData();
     formData.append('apiKey', data.apiKey || '');
