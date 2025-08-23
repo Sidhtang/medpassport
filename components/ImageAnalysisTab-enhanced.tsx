@@ -92,8 +92,15 @@ const ImageAnalysisTab = ({ apiKey, userRole }: ImageAnalysisTabProps) => {
     setSummaryResult('');
     
     try {
+      // Ensure file is defined before proceeding
+      if (!file) {
+        setError("No file selected");
+        setLoading(false);
+        return;
+      }
+      
       const imageAnalysisParams: ImageAnalysisParams = {
-        file,
+        file, // file is now guaranteed to be defined
         imageType: reportType,
         clinicalContext: additionalInfo,
         userRole
