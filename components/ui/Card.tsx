@@ -7,6 +7,7 @@ interface CardProps {
   children: ReactNode;
   accent?: 'primary' | 'secondary' | 'accent' | 'success' | 'warning' | 'error';
   hoverEffect?: boolean;
+  onClick?: () => void;
 }
 
 const Card: React.FC<CardProps> = ({ 
@@ -15,7 +16,8 @@ const Card: React.FC<CardProps> = ({
   className = '', 
   children,
   accent = 'primary',
-  hoverEffect = false
+  hoverEffect = false,
+  onClick
 }) => {
   const accentColors = {
     primary: 'before:bg-primary-500',
@@ -44,6 +46,7 @@ const Card: React.FC<CardProps> = ({
         ${hoverEffect ? `transition-all duration-300 ${accentShadow[accent]}` : ''}
         ${className}
       `}
+      onClick={onClick}
     >
       <div className="p-6">
         <div className="flex items-center mb-4">
