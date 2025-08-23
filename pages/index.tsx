@@ -170,7 +170,7 @@ export default function Home() {
       case 'batchProcessing':
         return <BatchProcessingTab apiKey={apiKey} userRole={userRole} />;
       case 'networkDiagnostics':
-        return <NetworkDiagnosticsTab apiKey={apiKey} />;
+        return <NetworkDiagnosticsTab />;
       case 'help':
         return <HelpInformationTab />;
       default:
