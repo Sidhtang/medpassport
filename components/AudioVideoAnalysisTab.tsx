@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { AnalysisResult, SUPPORTED_LANGUAGES, REPORT_TYPES } from '@/lib/types';
+import { AnalysisResult, SUPPORTED_LANGUAGES, REPORT_TYPES, AudioVideoFormData } from '@/lib/types';
 import { analyzeAudioVideo, translateText, summarizeAnalysis, generatePdfReport } from '@/lib/api';
 
 const AudioVideoAnalysisTab: React.FC<{ apiKey: string; userRole: string }> = ({ apiKey, userRole }) => {
